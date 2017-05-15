@@ -41,11 +41,14 @@
 #define M_PI 3.14159265358979323846264338
 #endif
 
-#define SAMPLE_RATE 44100
-#define SAMPLE_COUNT (SAMPLE_RATE * 4) /* 4 seconds */
+#define DURATION 5 /* in seconds */
+#define CHANNELS 1
+#define SAMPLE_RATE 48000
+#define SAMPLE_COUNT (SAMPLE_RATE * DURATION)
 #define AMPLITUDE (1.0 * 0x7F000000)
 #define LEFT_FREQ (344.0 / SAMPLE_RATE)
 #define RIGHT_FREQ (466.0 / SAMPLE_RATE)
+#define LA_440 (440.0 / SAMPLE_RATE)
 
 int main(void) {
     SNDFILE *file;
@@ -62,8 +65,8 @@ int main(void) {
 
     sfinfo.samplerate = SAMPLE_RATE;
     sfinfo.frames = SAMPLE_COUNT;
-    sfinfo.channels = 2;
-    sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_24);
+    sfinfo.channels = CHANNELS;
+    sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_32);
 
     if (!(file = sf_open("sine.wav", SFM_WRITE, &sfinfo))) {
         printf("Error : Not able to open output file.\n");
@@ -73,7 +76,7 @@ int main(void) {
 
     if (sfinfo.channels == 1) {
         for (k = 0; k < SAMPLE_COUNT; k++)
-            buffer[k] = AMPLITUDE * sin(LEFT_FREQ * 2 * k * M_PI);
+            buffer[k] = AMPLITUDE * sin(LA_440 * 2 * k * M_PI);
     } else if (sfinfo.channels == 2) {
         for (k = 0; k < SAMPLE_COUNT; k++) {
             buffer[2 * k] = AMPLITUDE * sin(LEFT_FREQ * 2 * k * M_PI);
