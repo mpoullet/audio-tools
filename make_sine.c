@@ -37,35 +37,36 @@
 
 #include <sndfile.h>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846264338
-#endif
-
-#define DURATION 5 /* in seconds */
-#define CHANNELS 1
-#define SAMPLE_RATE 48000
-#define SAMPLE_COUNT (SAMPLE_RATE * DURATION)
-#define AMPLITUDE (1.0 * 0x7F000000)
-#define LEFT_FREQ (344.0 / SAMPLE_RATE)
-#define RIGHT_FREQ (466.0 / SAMPLE_RATE)
-#define LA_440 (440.0 / SAMPLE_RATE)
-
 int main(void) {
+    const double M_PI = 3.14159265358979323846264338;
+    const double freq = 440.0;
+    const double duration = 1/freq;
+    const int channels = 1;
+    const int samplerate = 48000;
+    const int sample_count = samplerate * duration;
+    const double amplitude = 1.0 * 0x7F000000;
+
+    printf("duration=%f\n", duration);
+    printf("channels=%d\n", channels);
+    printf("samplerate=%d\n", samplerate);
+    printf("sample_count=%d\n", sample_count);
+    printf("amplitude=%f\n", amplitude);
+    printf("freq=%f\n", freq);
+
     SNDFILE *file;
     SF_INFO sfinfo;
-    int k;
     int *buffer;
 
-    if (!(buffer = malloc(2 * SAMPLE_COUNT * sizeof(int)))) {
-        printf("Malloc failed.\n");
+    if (!(buffer = malloc(2 * sample_count * sizeof(int)))) {
+        printf("Error : Malloc failed.\n");
         exit(0);
     };
 
     memset(&sfinfo, 0, sizeof(sfinfo));
 
-    sfinfo.samplerate = SAMPLE_RATE;
-    sfinfo.frames = SAMPLE_COUNT;
-    sfinfo.channels = CHANNELS;
+    sfinfo.samplerate = samplerate;
+    sfinfo.frames = sample_count;
+    sfinfo.channels = channels;
     sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_32);
 
     if (!(file = sf_open("sine.wav", SFM_WRITE, &sfinfo))) {
@@ -75,20 +76,17 @@ int main(void) {
     };
 
     if (sfinfo.channels == 1) {
-        for (k = 0; k < SAMPLE_COUNT; k++)
-            buffer[k] = AMPLITUDE * sin(LA_440 * 2 * k * M_PI);
-    } else if (sfinfo.channels == 2) {
-        for (k = 0; k < SAMPLE_COUNT; k++) {
-            buffer[2 * k] = AMPLITUDE * sin(LEFT_FREQ * 2 * k * M_PI);
-            buffer[2 * k + 1] = AMPLITUDE * sin(RIGHT_FREQ * 2 * k * M_PI);
-        };
+        for (int k = 0; k < sample_count; k++)
+            buffer[k] = amplitude * sin(freq * 2 * k * M_PI / samplerate);
     } else {
-        printf("makesine can only generate mono or stereo files.\n");
+        printf("Error : make_sine can only generate mono files.\n");
+	sf_close(file);
+	free(buffer);
         exit(1);
     };
 
-    if (sf_write_int(file, buffer, sfinfo.channels * SAMPLE_COUNT) !=
-        sfinfo.channels * SAMPLE_COUNT)
+    if (sf_write_int(file, buffer, sfinfo.channels * sample_count) !=
+        sfinfo.channels * sample_count)
         puts(sf_strerror(file));
 
     sf_close(file);
