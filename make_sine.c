@@ -43,13 +43,16 @@ int main(void) {
     const double duration = 1/freq;
     const int channels = 1;
     const int samplerate = 48000;
+    const double sample_duration = 1.0/samplerate;
     const int sample_count = samplerate * duration;
-    const double amplitude = 1.0 * 0x7F000000;
+    // 0x2F000000 => 788529152
+    const double amplitude = 1.0 * 0x2F000000;
 
     printf("duration=%f\n", duration);
     printf("channels=%d\n", channels);
     printf("samplerate=%d\n", samplerate);
     printf("sample_count=%d\n", sample_count);
+    printf("sample_duration=%f\n", sample_duration);
     printf("amplitude=%f\n", amplitude);
     printf("freq=%f\n", freq);
 
@@ -76,8 +79,10 @@ int main(void) {
     };
 
     if (sfinfo.channels == 1) {
-        for (int k = 0; k < sample_count; k++)
+        for (int k = 0; k < sample_count; k++) {
             buffer[k] = amplitude * sin(freq * 2 * k * M_PI / samplerate);
+            printf("%d: %f: %d\n", k, sample_duration*k, buffer[k]);
+        }
     } else {
         printf("Error : make_sine can only generate mono files.\n");
 	sf_close(file);
