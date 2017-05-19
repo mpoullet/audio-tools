@@ -35,9 +35,10 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <sndfile.h>
+#include <sndfile.hh>
 
 int main() {
+    const char * filename = "sine.wav";
     const double pi = 3.14159265358979323846264338;
     const double freq = 440.0;
     const double duration = 1/freq;
@@ -56,45 +57,27 @@ int main() {
     printf("amplitude=%f\n", amplitude);
     printf("freq=%f\n", freq);
 
-    SNDFILE *file;
-    SF_INFO sfinfo;
-    int *buffer;
+    SndfileHandle sndfilehandle(filename, SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_32), channels, samplerate);
 
+    int *buffer;
     if (!(buffer = static_cast<int *>(malloc(2 * sample_count * sizeof *buffer)))) {
         printf("Error : Malloc failed.\n");
         return 1;
     };
 
-    memset(&sfinfo, 0, sizeof(sfinfo));
-
-    sfinfo.samplerate = samplerate;
-    sfinfo.frames = sample_count;
-    sfinfo.channels = channels;
-    sfinfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_32);
-
-    if (!(file = sf_open("sine.wav", SFM_WRITE, &sfinfo))) {
-        printf("Error : Not able to open output file.\n");
-        free(buffer);
-        return 1;
-    };
-
-    if (sfinfo.channels == 1) {
+    if (sndfilehandle.channels() == 1) {
         for (int k = 0; k < sample_count; k++) {
             buffer[k] = amplitude * sin(freq * 2 * k * pi / samplerate);
             printf("%d: %f: %d\n", k, sample_duration*k, buffer[k]);
         }
     } else {
         printf("Error : make_sine can only generate mono files.\n");
-	sf_close(file);
 	free(buffer);
         return 1;
     };
 
-    if (sf_write_int(file, buffer, sfinfo.channels * sample_count) !=
-        sfinfo.channels * sample_count)
-        puts(sf_strerror(file));
+    sndfilehandle.write(buffer, sndfilehandle.channels() * sample_count);
 
-    sf_close(file);
     free(buffer);
     return 0;
 } /* main */
