@@ -30,15 +30,15 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <sndfile.h>
 
-int main(void) {
-    const double M_PI = 3.14159265358979323846264338;
+int main() {
+    const double pi = 3.14159265358979323846264338;
     const double freq = 440.0;
     const double duration = 1/freq;
     const int channels = 1;
@@ -60,9 +60,9 @@ int main(void) {
     SF_INFO sfinfo;
     int *buffer;
 
-    if (!(buffer = malloc(2 * sample_count * sizeof(int)))) {
+    if (!(buffer = static_cast<int *>(malloc(2 * sample_count * sizeof *buffer)))) {
         printf("Error : Malloc failed.\n");
-        exit(0);
+        return 1;
     };
 
     memset(&sfinfo, 0, sizeof(sfinfo));
@@ -80,14 +80,14 @@ int main(void) {
 
     if (sfinfo.channels == 1) {
         for (int k = 0; k < sample_count; k++) {
-            buffer[k] = amplitude * sin(freq * 2 * k * M_PI / samplerate);
+            buffer[k] = amplitude * sin(freq * 2 * k * pi / samplerate);
             printf("%d: %f: %d\n", k, sample_duration*k, buffer[k]);
         }
     } else {
         printf("Error : make_sine can only generate mono files.\n");
 	sf_close(file);
 	free(buffer);
-        exit(1);
+        return 1;
     };
 
     if (sf_write_int(file, buffer, sfinfo.channels * sample_count) !=
