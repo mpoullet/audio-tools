@@ -38,16 +38,16 @@
 #include <sndfile.hh>
 
 int main() {
-    const char * filename = "sine.wav";
-    const double pi = 3.14159265358979323846264338;
-    const double freq = 440.0;
-    const double duration = 1/freq;
-    const int channels = 1;
-    const int samplerate = 48000;
-    const double sample_duration = 1.0/samplerate;
-    const int sample_count = samplerate * duration;
+    constexpr const char * filename = "sine.wav";
+    constexpr double pi = 3.14159265358979323846264338;
+    constexpr double freq = 440.0;
+    constexpr double duration = 1/freq;
+    constexpr int channels = 1;
+    constexpr int samplerate = 48000;
+    constexpr double sample_duration = 1.0/samplerate;
+    constexpr int sample_count = samplerate * duration;
     // 0x2F000000 => 788529152
-    const double amplitude = 1.0 * 0x2F000000;
+    constexpr double amplitude = 1.0 * 0x2F000000;
 
     printf("duration=%f\n", duration);
     printf("channels=%d\n", channels);
