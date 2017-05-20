@@ -1,3 +1,5 @@
+make_sine_clang
+make_sine_g++
 make_sine
 *.png
 *.wav
