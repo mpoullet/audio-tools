@@ -1,2 +1,3 @@
 #!/bin/sh
-g++ -std=c++14 -Wall -Wextra -Werror -pedantic -o make_sine make_sine.cc -lsndfile -lm && ./make_sine
+clang++-3.9 -std=c++14 -Wall -Wextra -Werror -pedantic -o make_sine_clang make_sine.cc -lsndfile -lm && ./make_sine_clang
+g++         -std=c++14 -Wall -Wextra -Werror -pedantic -o make_sine_g++   make_sine.cc -lsndfile -lm && ./make_sine_g++
