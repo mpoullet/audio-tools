@@ -30,11 +30,9 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <cmath>
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <memory>
+#include <cmath>
+#include <array>
 
 #include <sndfile.hh>
 
@@ -59,19 +57,19 @@ int main() {
     printf("freq=%f\n", freq);
 
     SndfileHandle sndfilehandle(filename, SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_32), channels, samplerate);
-    std::unique_ptr<int, void (*)(void*)> buffer(static_cast<int *>(std::malloc(2 * sample_count * sizeof(int))), &std::free);
+    std::array<int, channels * sample_count> buffer;
 
     if (sndfilehandle.channels() == 1) {
         for (int k = 0; k < sample_count; k++) {
-            (buffer.get())[k] = amplitude * sin(freq * 2 * k * pi / samplerate);
-            printf("%d: %f: %d\n", k, sample_duration*k, (buffer.get())[k]);
+            buffer[k] = amplitude * sin(freq * 2 * k * pi / samplerate);
+            printf("%d: %f: %d\n", k, sample_duration*k, buffer[k]);
         }
     } else {
         printf("Error : make_sine can only generate mono files.\n");
         return 1;
     };
 
-    sndfilehandle.write(buffer.get(), sndfilehandle.channels() * sample_count);
+    sndfilehandle.write(buffer.data(), sndfilehandle.channels() * sample_count);
 
     return 0;
 } /* main */
