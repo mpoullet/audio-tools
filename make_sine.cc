@@ -37,7 +37,6 @@
 #include <sndfile.hh>
 
 int main() {
-    constexpr const char * filename = "sine.wav";
     constexpr double pi = 3.14159265358979323846264338;
     constexpr double freq = 440.0;
     constexpr double duration = 5;//1/freq;
@@ -45,31 +44,31 @@ int main() {
     constexpr int samplerate = 48000;
     constexpr double sample_duration = 1.0/samplerate;
     constexpr int sample_count = samplerate * duration;
-    // 0x2F000000 => 788529152
-    constexpr double amplitude = 1.0 * 0x2F000000;
 
     printf("duration=%f\n", duration);
     printf("channels=%d\n", channels);
     printf("samplerate=%d\n", samplerate);
     printf("sample_count=%d\n", sample_count);
     printf("sample_duration=%f\n", sample_duration);
-    printf("amplitude=%f\n", amplitude);
     printf("freq=%f\n", freq);
 
-    SndfileHandle sndfilehandle(filename, SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_32), channels, samplerate);
-    std::array<int, channels * sample_count> buffer;
+    SndfileHandle sndfilehandle_pcm32("sine32.wav", SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_32), channels, samplerate);
+    SndfileHandle sndfilehandle_pcm24("sine24.wav", SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_24), channels, samplerate);
+    SndfileHandle sndfilehandle_pcm16("sine16.wav", SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_16), channels, samplerate);
+    SndfileHandle sndfilehandle_pcmf ("sinef.wav",  SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_FLOAT),  channels, samplerate);
+    SndfileHandle sndfilehandle_pcmd ("sined.wav",  SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_DOUBLE), channels, samplerate);
+    std::array<double, channels * sample_count> buffer;
 
-    if (sndfilehandle.channels() == 1) {
-        for (int k = 0; k < sample_count; k++) {
-            buffer[k] = amplitude * sin(freq * 2 * k * pi / samplerate);
-            printf("%d: %f: %d\n", k, sample_duration*k, buffer[k]);
-        }
-    } else {
-        printf("Error : make_sine can only generate mono files.\n");
-        return 1;
-    };
+    for (int k = 0; k < sample_count; k++) {
+        buffer[k] = sin(freq * 2 * k * pi / samplerate);
+        printf("%d: %f: %f\n", k, sample_duration*k, buffer[k]);
+    }
 
-    sndfilehandle.write(buffer.data(), sndfilehandle.channels() * sample_count);
+    sndfilehandle_pcm32.write(buffer.data(), sndfilehandle_pcm32.channels() * sample_count);
+    sndfilehandle_pcm24.write(buffer.data(), sndfilehandle_pcm24.channels() * sample_count);
+    sndfilehandle_pcm16.write(buffer.data(), sndfilehandle_pcm16.channels() * sample_count);
+    sndfilehandle_pcmf.write (buffer.data(), sndfilehandle_pcmf.channels()  * sample_count);
+    sndfilehandle_pcmd.write (buffer.data(), sndfilehandle_pcmd.channels()  * sample_count);
 
     return 0;
 } /* main */
