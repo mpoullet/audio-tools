@@ -13,5 +13,9 @@ clang -std=c11 -o real_valued_fwd_fft_floats    -Wall -Wextra -Werror -pedantic 
 
 cppcheck --enable=all --suppress=missingIncludeSystem *.cc *.c
 
+g++     -std=c++14 -Wall -Wextra -Werror -pedantic -o command_line command_line.cc -lboost_program_options
+clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -o command_line command_line.cc -lboost_program_options
+
 echo "Running make_sine..."
 ./make_sine
+./command_line --sr 48000
