@@ -4,21 +4,13 @@
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
 
+#include "NamedType.hpp"
+
 namespace {
 const size_t ERROR_IN_COMMAND_LINE = 1;
 const size_t SUCCESS = 0;
 const size_t ERROR_UNHANDLED_EXCEPTION = 2;
 }
-
-template <typename T, typename Parameter> class NamedType {
-  public:
-    explicit NamedType(T const &value) : value_(value) {}
-    T &get() { return value_; }
-    T const &get() const { return value_; }
-
-  private:
-    T value_;
-};
 
 namespace parameters {
 using SampleRate = NamedType<int, struct SampleRateTag>;
