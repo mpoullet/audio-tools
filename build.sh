@@ -16,6 +16,12 @@ cppcheck --enable=all --suppress=missingIncludeSystem *.cc *.c
 g++     -std=c++14 -Wall -Wextra -Werror -pedantic -o command_line command_line.cc -lboost_program_options -lboost_system -lboost_filesystem -lsndfile -lm
 clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -o command_line command_line.cc -lboost_program_options -lboost_system -lboost_filesystem -lsndfile -lm
 
+g++     -std=c++14 -Wall -Wextra -Werror -pedantic -o block_processing -I kiss_fft130/ -I kiss_fft130/tools/ kiss_fft130/kiss_fft.c  kiss_fft130/tools/kiss_fftr.c block_processing.cc -lsndfile
+
+# TODO: fix this!
+#clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -o block_processing -I kiss_fft130/ -I kiss_fft130/tools/ kiss_fft130/kiss_fft.c  kiss_fft130/tools/kiss_fftr.c block_processing.cc -lsndfile
+
 echo "Running..."
 #./make_sine
-./command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine
+#./command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine
+./block_processing
