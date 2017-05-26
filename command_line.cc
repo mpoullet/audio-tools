@@ -157,6 +157,7 @@ int main(int argc, char **argv) {
 
         // Default values
         double frequency = 440.0;
+        //double duration = 10*1.0/frequency;
         double duration = 1;
         int sample_rate = 48000;
         std::string audio_format = "pcm24";

@@ -1,31 +1,77 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <complex>
 
 #include <sndfile.hh>
 
+#define kiss_fft_scalar double
+#include "kiss_fft.h"
+
 int main()
 {
+    const int I = 2;
+    const int D = 1;
     const int N = 256;
+    const int M = I*N/D;
     const int L = N/8;
-    const std::string filename = "sine_48000_pcm32.wav";
-    SndfileHandle  infile(filename);
+
+    kiss_fft_cfg fwd = kiss_fft_alloc(N, 0, NULL, NULL);
+    kiss_fft_cfg inv = kiss_fft_alloc(M, 1, NULL, NULL);
+
+    const std::string infilename = "sine_48000_pcm32.wav";
+    const std::string outfilename = "out.wav";
+    SndfileHandle  infile(infilename);
+    SndfileHandle outfile(outfilename, SFM_WRITE, infile.format(), infile.channels(), infile.samplerate());
 
     std::vector<double> buffer(N);
+
+    std::vector<std::complex<double>> fwd_fft_in_buffer(N);
+    std::vector<std::complex<double>> fwd_fft_out_buffer(N);
 
     /* prepend 2L zeros */
     for (int i=0; i < 2*L; ++i) {
         buffer[i] = 0;
     }
 
-    while (sf_count_t readcount = infile.read(buffer.data() + 2*L, N-2*L))
+    while (sf_count_t readcount = infile.read(buffer.data() + 2*L, N - 2*L))
     {   
-        for (int i=0; i < readcount; ++i) {
+        /* Store original samples */
+        outfile.write(buffer.data() + 2*L, std::min(static_cast<int>(readcount), N - 2*L));
+
+        /* Process block with 2*L overlap */
+        for (int i=0; i < std::min(static_cast<int>(readcount) + 2*L, N); ++i) {
             std::cout << i << " " << buffer[i] << "\n";
         }
         std::cout << "\n\n";
-        std::rotate(buffer.begin(), buffer.begin() + N-2*L, buffer.end());
+
+        /* Create FFT input buffer */
+        std::transform(std::begin(buffer),
+                       std::end(buffer),
+                       std::back_inserter(fwd_fft_in_buffer),
+                       [](double r) { return std::complex<double>(r, 0); });
+        for(int i=0; i < N; ++i) {
+            //std::cout << i << " " << fwd_fft_in_buffer[i].real << ";" fwd_fft_in_buffer[i].imag << "\n";
+            std::cout << i << " " << fwd_fft_in_buffer[i] << "\n";
+        }
+
+        /* FFT */
+        kiss_fft(fwd, (kiss_fft_cpx *)fwd_fft_in_buffer.data(), (kiss_fft_cpx *)(fwd_fft_out_buffer.data()));
+        for(int i=0; i < N; ++i) {
+            std::cout << "FFT: " << i << " " << fwd_fft_out_buffer[i] << "\n";
+        }
+        std::cout << "\n\n";
+
+        /* Create IFFT input buffer */
+
+        /* IFFT */
+
+        /* Shift vector to the left 2*L times */
+        std::rotate(buffer.begin(), buffer.begin() + N - 2*L, buffer.end());
     };
+
+    kiss_fft_free(fwd);
+    kiss_fft_free(inv);
 
     return 0;
 }
