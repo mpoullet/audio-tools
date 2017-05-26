@@ -6,4 +6,5 @@ block_processing
 *.png
 *.wav
 *.swp
+*.o
 octave-workspace
