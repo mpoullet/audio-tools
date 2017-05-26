@@ -2,6 +2,7 @@ make_sine
 complex_valued_fwd_fft_floats
 real_valued_fwd_fft_floats
 command_line
+block_processing
 *.png
 *.wav
 *.swp
