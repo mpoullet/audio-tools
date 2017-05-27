@@ -22,7 +22,7 @@ int main()
     const std::string infilename = "sine_48000_pcm32.wav";
     const std::string outfilename = "out.wav";
     SndfileHandle  infile(infilename);
-    SndfileHandle outfile(outfilename, SFM_WRITE, infile.format(), infile.channels(), infile.samplerate());
+    SndfileHandle outfile(outfilename, SFM_WRITE, infile.format(), infile.channels(), infile.samplerate() * I/D);
 
     std::vector<double> buffer(N);
 
@@ -39,28 +39,18 @@ int main()
         /* Store original samples */
         outfile.write(buffer.data() + 2*L, std::min(static_cast<int>(readcount), N - 2*L));
 
-        /* Process block with 2*L overlap */
-        for (int i=0; i < std::min(static_cast<int>(readcount) + 2*L, N); ++i) {
-            std::cout << i << " " << buffer[i] << "\n";
+        /* Create FFT input buffer: 1 block of N samples with 2*L overlap */
+        for(int i=0; i < std::min(static_cast<int>(readcount) + 2*L, N); ++i) {
+            fwd_fft_in_buffer[i] = std::complex<double>(buffer[i], 0.0);
+            std::cout << i << ": " << fwd_fft_in_buffer[i] << "\n";
         }
-        std::cout << "\n\n";
+        std::cout << "\n";
 
-        /* Create FFT input buffer */
-        std::transform(std::begin(buffer),
-                       std::end(buffer),
-                       std::back_inserter(fwd_fft_in_buffer),
-                       [](double r) { return std::complex<double>(r, 0); });
-        for(int i=0; i < N; ++i) {
-            //std::cout << i << " " << fwd_fft_in_buffer[i].real << ";" fwd_fft_in_buffer[i].imag << "\n";
-            std::cout << i << " " << fwd_fft_in_buffer[i] << "\n";
-        }
-
-        /* FFT */
+        /* Forward N points FFT */
         kiss_fft(fwd, (kiss_fft_cpx *)fwd_fft_in_buffer.data(), (kiss_fft_cpx *)(fwd_fft_out_buffer.data()));
         for(int i=0; i < N; ++i) {
             std::cout << "FFT: " << i << " " << fwd_fft_out_buffer[i] << "\n";
         }
-        std::cout << "\n\n";
 
         /* Create IFFT input buffer */
 
