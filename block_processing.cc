@@ -68,16 +68,16 @@ int main()
             bwd_fft_in_buffer[i] = static_cast<double>(I/D) * fwd_fft_out_buffer[i + M/2];
         }
 
-        /* IFFT */
+        /* Backward M points IFFT */
         kiss_fft(inv, (kiss_fft_cpx *)bwd_fft_in_buffer.data(), (kiss_fft_cpx *)(bwd_fft_out_buffer.data()));
         for(int i=0; i < M; ++i) {
             std::cout << "IFFT: " << i << " " << bwd_fft_out_buffer[i] << "\n";
         }
 
         /* Discard first and last L points and store the rest of the real vector */
-        std::vector<double> res(M - 2*L);
-        int j = L;
-        for(int i=0; i < M - 2*L; ++i) {
+        std::vector<double> res(M - 2*I/D*L);
+        int j = I/D*L;
+        for(int i=0; i < M - 2*I/D*L; ++i) {
             res[i] = bwd_fft_out_buffer[j++].real();
         }
         resfile.write(res.data(), res.size());
