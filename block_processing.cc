@@ -74,7 +74,7 @@ int main()
             std::cout << "IFFT: " << i << " " << bwd_fft_out_buffer[i] << "\n";
         }
 
-        /* Discard first and last L points and store the rest of the real vector */
+        /* Discard first and last I/D*L points and store the rest of the real vector */
         std::vector<double> res(M - 2*I/D*L);
         int j = I/D*L;
         for(int i=0; i < M - 2*I/D*L; ++i) {
