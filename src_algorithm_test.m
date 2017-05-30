@@ -37,15 +37,29 @@ title(title_name);
 
 % FFT
 fft_data = fft(input);
-f_block = fs*(-N/2:N/2-1)/N;
 
 % Plot N points FFT output block in frequency domain
+f_block = fs*(-N/2:N/2-1)/N;
 title_name = '|DFT Values|';
 figure('Name', title_name, 'NumberTitle', 'off');
 plot(f_block, abs(fftshift(fft_data)));
-xlim([0 1000]);
+xlim([-500 500]);
 xlabel('Frequency (Hz)');
 ylabel('|DFT Values|');
+
+% IFFT
+N1 = I/D*N;
+ifft_input=[fft_data(1:N/2)';zeros(N1-N,1);fft_data(N/2+1:N)'];
+ifft_data=ifft(ifft_input);
+
+% Plot N1 points output block in time domain
+t_block = (1/(I/D*fs))*(1:N1);
+title_name = 'Time Domain (first block resampled)';
+figure('Name', title_name, 'NumberTitle', 'off');
+plot(t_block, real(ifft_data));
+xlabel('Time (s)');
+ylabel('Amplitude');
+title(title_name);
 
 %
 % Overlap approach for long sequences
