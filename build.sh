@@ -37,5 +37,5 @@ clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft13
 
 echo "Running..."
 #./make_sine
-./command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.002272 --verbose
+./command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
 ./block_processing
