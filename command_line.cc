@@ -124,6 +124,26 @@ namespace parameters {
             throw validation_error(validation_error::invalid_option_value);
         }
     }
+
+    const OptionName verboseOptionName("verbose", "v");
+
+    const OptionName durationOptionName("duration", "d");
+    using Duration = NamedType<double, struct DurationTag>;
+
+    void validate(boost::any &v, std::vector<std::string> const &values,
+                  Duration *, int) {
+        using namespace boost::program_options;
+        validators::check_first_occurrence(v);
+    
+        std::string const &s = validators::get_single_string(values);
+        
+        double duration = boost::lexical_cast<double>(s);
+        if (duration > 0) {
+            v = boost::any(Duration(duration));
+        } else {
+            throw validation_error(validation_error::invalid_option_value);
+        } 
+    }
 }
 
 int audio_format_to_sf_format(const std::string& audio_format)
@@ -151,17 +171,20 @@ int main(int argc, char **argv) {
                 (parameters::sampleRateOptionName.get_complete().c_str(),  po::value<parameters::SampleRate>()->value_name(" "),                        sampleRatesOptions.c_str())
                 (parameters::audioFormatOptionName.get_complete().c_str(), po::value<parameters::AudioFormat>()->value_name(" "),                       validAudioFormats.c_str())
                 (parameters::prefixNameOptionName.get_complete().c_str(),  po::value<parameters::PrefixName>()->value_name(" "),                        "<prefix_name>_<sample-rate>_<audio_format>.wav")
+                (parameters::durationOptionName.get_complete().c_str(),    po::value<parameters::Duration>()->value_name(" "),                          "length of the sine wave in seconds")
+                (parameters::verboseOptionName.get_complete().c_str(),     po::bool_switch()->default_value(false),                                     "print each samples")
                 (parameters::helpOptionName.get_complete().c_str(), "");
 
         po::variables_map vm;
 
         // Default values
         double frequency = 440.0;
-        //double duration = 10*1.0/frequency;
-        double duration = 1;
+        double duration = 1.0;
         int sample_rate = 48000;
         std::string audio_format = "pcm24";
         std::string prefix = "sine";
+        bool verbose = false;
+
         try {
             po::store(po::parse_command_line(argc, argv, desc), vm);
 
@@ -188,6 +211,14 @@ int main(int argc, char **argv) {
                 prefix = vm[parameters::prefixNameOptionName.get_long()].as<parameters::PrefixName>().get();
             }
 
+            if (vm.count(parameters::verboseOptionName.get_long())) {
+                verbose = vm[parameters::verboseOptionName.get_long()].as<bool>();
+            }
+
+            if (vm.count(parameters::durationOptionName.get_long())) {
+                duration = vm[parameters::durationOptionName.get_long()].as<parameters::Duration>().get();
+            }
+
         } catch (po::error &e) {
             std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
             std::cerr << desc << std::endl;
@@ -205,24 +236,28 @@ int main(int argc, char **argv) {
         ss << ".wav";
         std::string output_filename = ss.str();
 
-        printf("frequency=%f\n", frequency);
-        printf("duration=%f\n", duration);
-        printf("sample_rate=%d\n", sample_rate);
-        printf("sample_count=%d\n", sample_count);
-        printf("sample_duration=%f\n", sample_duration);
-        printf("audio_format=%s\n", audio_format.c_str());
-        printf("output_filename=%s\n", output_filename.c_str());
-
+        if (verbose) {
+            printf("\nfrequency=%f\n", frequency);
+            printf("duration=%f\n", duration);
+            printf("sample_rate=%d\n", sample_rate);
+            printf("sample_count=%d\n", sample_count);
+            printf("sample_duration=%f\n", sample_duration);
+            printf("audio_format=%s\n", audio_format.c_str());
+            printf("output_filename=%s\n", output_filename.c_str());
+            printf("verbose=%s\n\n", (verbose) ? "true" : "false");
+        }
+    
         SndfileHandle sndfilehandle(output_filename, SFM_WRITE, (SF_FORMAT_WAV | audio_format_to_sf_format(audio_format)), 1, sample_rate);
         std::vector<double> buffer(sample_count);
 
         for (int k = 0; k < sample_count; k++) {
             const double pi = 3.14159265358979323846264338;
             buffer[k] = sin(frequency * 2 * k * pi / sample_rate);
-            printf("%d: %f: %f\n", k, sample_duration*k, buffer[k]);
+            if (verbose) printf("%8d: %.8f: % .8f\n", k, sample_duration*k, buffer[k]);
         }
 
         sndfilehandle.write(buffer.data(), sample_count);
+        std::cout << "\nCreating " << output_filename << "... done.\n\n";
     } catch (std::exception &e) {
         std::cerr << "Unhandled Exception reached the top of main: " << e.what()
                   << ", application will now exit" << std::endl;
