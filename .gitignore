@@ -3,6 +3,7 @@ complex_valued_fwd_fft_floats
 real_valued_fwd_fft_floats
 command_line
 block_processing
+test_fft
 *.png
 *.wav
 *.swp
