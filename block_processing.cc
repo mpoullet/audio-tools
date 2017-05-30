@@ -1,11 +1,10 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <complex>
 
 #include <sndfile.hh>
 
-#define kiss_fft_scalar double
+#define kiss_fft_scalar float
 #include "kiss_fft.h"
 
 int main()
@@ -26,13 +25,13 @@ int main()
     SndfileHandle outfile(outfilename, SFM_WRITE, infile.format(), infile.channels(), infile.samplerate());
     SndfileHandle resfile(resfilename, SFM_WRITE, infile.format(), infile.channels(), infile.samplerate() * I/D);
 
-    std::vector<double> buffer(N);
+    std::vector<kiss_fft_scalar> buffer(N);
 
-    std::vector<std::complex<double>> fwd_fft_in_buffer(N);
-    std::vector<std::complex<double>> fwd_fft_out_buffer(N);
+    std::vector<kiss_fft_cpx> fwd_fft_in_buffer(N);
+    std::vector<kiss_fft_cpx> fwd_fft_out_buffer(N);
 
-    std::vector<std::complex<double>> bwd_fft_in_buffer(M);
-    std::vector<std::complex<double>> bwd_fft_out_buffer(M);
+    std::vector<kiss_fft_cpx> bwd_fft_in_buffer(M);
+    std::vector<kiss_fft_cpx> bwd_fft_out_buffer(M);
 
     /* prepend 2L zeros */
     for (int i=0; i < 2*L; ++i) {
@@ -46,39 +45,43 @@ int main()
 
         /* Create FFT input buffer: 1 block of N samples with 2*L overlap */
         for(int i=0; i < std::min(static_cast<int>(readcount) + 2*L, N); ++i) {
-            fwd_fft_in_buffer[i] = std::complex<double>(buffer[i], 0.0);
-            std::cout << i << ": " << fwd_fft_in_buffer[i] << "\n";
+            fwd_fft_in_buffer[i].r = buffer[i];
+            fwd_fft_in_buffer[i].i = 0.0;
+            std::cout << i << ": (" << fwd_fft_in_buffer[i].r << "," << fwd_fft_in_buffer[i].i << ")\n";
         }
         std::cout << "\n";
 
         /* Forward N points FFT */
-        kiss_fft(fwd, (kiss_fft_cpx *)fwd_fft_in_buffer.data(), (kiss_fft_cpx *)(fwd_fft_out_buffer.data()));
+        kiss_fft(fwd, fwd_fft_in_buffer.data(), fwd_fft_out_buffer.data());
         for(int i=0; i < N; ++i) {
-            std::cout << "FFT: " << i << " " << fwd_fft_out_buffer[i] << "\n";
+            std::cout << " FFT: " << i << " (" << fwd_fft_out_buffer[i].r << "," << fwd_fft_out_buffer[i].i << ")\n";
         }
 
         /* Create IFFT input buffer */
         for(int i=0; i < N/2; ++i) {
-            bwd_fft_in_buffer[i] = static_cast<double>(I/D) * fwd_fft_out_buffer[i];
+            bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i].r;
+            bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i].i;
         }
         for(int i=N/2; i <= M - N/2; ++i) {
-            bwd_fft_in_buffer[i] = static_cast<double>(I/D) * std::complex<double>(0.0, 0.0);
+            bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * 0.0;
+            bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * 0.0;
         }
         for(int i=M - N/2 + 1; i < M; ++i) {
-            bwd_fft_in_buffer[i] = static_cast<double>(I/D) * fwd_fft_out_buffer[i + M/2];
+            bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i + M/2].r;
+            bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i + M/2].i;
         }
 
         /* Backward M points IFFT */
-        kiss_fft(inv, (kiss_fft_cpx *)bwd_fft_in_buffer.data(), (kiss_fft_cpx *)(bwd_fft_out_buffer.data()));
+        kiss_fft(inv, bwd_fft_in_buffer.data(), bwd_fft_out_buffer.data());
         for(int i=0; i < M; ++i) {
-            std::cout << "IFFT: " << i << " " << bwd_fft_out_buffer[i] << "\n";
+            std::cout << "IFFT: " << i << " (" << bwd_fft_out_buffer[i].r << "," << bwd_fft_out_buffer[i].i << ")\n";
         }
 
         /* Discard first and last I/D*L points and store the rest of the real vector */
         std::vector<double> res(M - 2*I/D*L);
         int j = I/D*L;
         for(int i=0; i < M - 2*I/D*L; ++i) {
-            res[i] = bwd_fft_out_buffer[j++].real();
+            res[i] = bwd_fft_out_buffer[j++].r;
         }
         resfile.write(res.data(), res.size());
 
