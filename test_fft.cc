@@ -3,6 +3,8 @@
 #include <iostream>
 #include <complex>
 #include <numeric>
+#include <memory>
+#include <type_traits>
 #include <array>
 
 #include <cmath>
@@ -18,6 +20,15 @@
 #define kiss_fft_scalar float
 #include "kiss_fft.h"
 
+namespace std {
+    template<>
+    class default_delete<std::remove_pointer<kiss_fft_cfg>::type>
+    {
+        public:
+            void operator()(std::remove_pointer<kiss_fft_cfg>::type *p) { free(p); }
+    };
+}
+
 int main()
 {
     std::array<kiss_fft_cpx, N> in;
@@ -29,10 +40,19 @@ int main()
         //std::cout << in[i].r << "," << in[i].i << "\n";
     }
 
-    kiss_fft_cfg cfg;
-    if ((cfg = kiss_fft_alloc(N, 0, NULL, NULL)) != NULL) {
-        kiss_fft(cfg, in.data(), out.data());
-        free(cfg);
+    // RAII without default_delete
+    auto cfg1 = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(free) *> {
+        kiss_fft_alloc(N, 0, NULL, NULL),
+        free
+    };
+
+    // RAII with default delete
+    auto cfg2 = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type> {
+        kiss_fft_alloc(N, 0, NULL, NULL)
+    };
+
+    if (cfg1) {
+        kiss_fft(cfg1.get(), in.data(), out.data());
 
         for (size_t i = 0; i < N; i++) {
             printf(" in[%2zu] = %+f , %+f    "
