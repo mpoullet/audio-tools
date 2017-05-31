@@ -2,6 +2,10 @@ clear;
 close all;
 
 % http://www.gaussianwaves.com/2014/07/how-to-plot-fft-using-matlab-fft-of-basic-signals-sine-and-cosine-waves/
+% http://calculator.vhex.net/post/calculator-result/1d-discrete-fourier-transform
+% http://www.phys.nsu.ru/cherk/fft.pdf
+% http://csserver.evansville.edu/~richardson/courses/Tutorials/audio/AudioProcessing.pdf
+% http://mirlab.org/jang/books/audioSignalProcessing/matlab4waveRead.asp?title=4-2%20Reading%20Wave%20Files
 
 % Parameters
 I = 2;
@@ -49,7 +53,7 @@ ylabel('|DFT Values|');
 
 % IFFT
 N1 = I/D*N;
-ifft_input=[fft_data(1:N/2)';zeros(N1-N,1);fft_data(N/2+1:N)'];
+ifft_input=[I/D*fft_data(1:N/2)';zeros(N1-N,1);I/D*fft_data(N/2+1:N)'];
 ifft_data=ifft(ifft_input);
 
 % Plot N1 points output block in time domain
@@ -57,6 +61,7 @@ t_block = (1/(I/D*fs))*(1:N1);
 title_name = 'Time Domain (first block resampled)';
 figure('Name', title_name, 'NumberTitle', 'off');
 plot(t_block, real(ifft_data));
+ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
 title(title_name);
