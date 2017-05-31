@@ -28,8 +28,17 @@ title(title_name);
 %
 % Overlap approach for long sequences
 %
+N1 = I/D*N;
+
 L = N/8;
 L1 = I/D*L;
 
-% Prepare first block 2*L overlap
-input = [zeros(2*L,1)' data']'(1:N);
+% Fake input data
+data = (0:1:length(data)-1);
+
+% Prepend first block 2*L overlap
+%input = zeros(2*L,1);
+
+% Read a block of length N-2*L
+for i=1:fix(length(data)/(N-2*L))
+end
