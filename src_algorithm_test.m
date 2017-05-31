@@ -53,14 +53,35 @@ ylabel('|DFT Values|');
 
 % IFFT
 N1 = I/D*N;
-ifft_input=[I/D*fft_data(1:N/2)';zeros(N1-N,1);I/D*fft_data(N/2+1:N)'];
-ifft_data=ifft(ifft_input);
+
+% Method 1
+
+% C_i = 0
+ifft_input_zeros=[I/D*fft_data(1:N/2)';zeros(N1-N,1);I/D*fft_data(N/2+1:N)'];
+ifft_data_zeros=ifft(ifft_input_zeros);
 
 % Plot N1 points output block in time domain
 t_block = (1/(I/D*fs))*(1:N1);
-title_name = 'Time Domain (first block resampled)';
+title_name = 'Time Domain (first block resampled) | C_i=0';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_block, real(ifft_data));
+plot(t_block, real(ifft_data_zeros));
+ylim([-1 1]);
+xlabel('Time (s)');
+ylabel('Amplitude');
+title(title_name);
+
+% Method 2
+
+% C_i = X(N/2)
+filling(1:N1-N) = fft_data(N/2);
+ifft_input_nonzeros=[I/D*fft_data(1:N/2)';filling';I/D*fft_data(N/2+1:N)'];
+ifft_data_nonzeros=ifft(ifft_input_nonzeros);
+
+% Plot N1 points output block in time domain
+t_block = (1/(I/D*fs))*(1:N1);
+title_name = 'Time Domain (first block resampled) | C_i=X(N/2)';
+figure('Name', title_name, 'NumberTitle', 'off');
+plot(t_block, real(ifft_data_nonzeros));
 ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
@@ -70,8 +91,7 @@ title(title_name);
 % Overlap approach for long sequences
 %
 L = N/8;
-N1 = I/D*N;
 L1 = I/D*L;
 
 % Prepare first block 2*L overlap
-%input = [zeros(2*L,1)' data']'(1:N);
+input = [zeros(2*L,1)' data']'(1:N);
