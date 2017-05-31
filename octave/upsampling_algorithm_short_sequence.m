@@ -1,3 +1,9 @@
+% Sampling Rate Conversion in the Frequency Domain [DSP Tips and Tricks]
+% Guoan Bi and Sanjit K. Mitra
+% IEEE Signal Processing Magazine ( Volume: 28, Issue: 3, May 2011 )
+% Page(s): 140 - 144
+% DOI: 10.1109/MSP.2011.940413
+
 clear;
 close all;
 
