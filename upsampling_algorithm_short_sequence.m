@@ -87,11 +87,3 @@ xlabel('Time (s)');
 ylabel('Amplitude');
 title(title_name);
 
-%
-% Overlap approach for long sequences
-%
-L = N/8;
-L1 = I/D*L;
-
-% Prepare first block 2*L overlap
-input = [zeros(2*L,1)' data']'(1:N);
