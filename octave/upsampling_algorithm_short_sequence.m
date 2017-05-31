@@ -18,7 +18,7 @@ sample_counts = length(data);
 
 % Plot sound file in time domain
 t_all = (1/fs)*(1:sample_counts);
-title_name = 'Time Domain (all samples)';
+title_name = 'Time domain (all samples) 48kHz';
 figure('Name', title_name, 'NumberTitle', 'off');
 plot(t_all, data);
 xlabel('Time (s)');
@@ -32,7 +32,7 @@ title(title_name);
 % Plot N points input block in time domain
 input = data(1:N)';
 t_block = (1/fs)*(1:N);
-title_name = 'Time Domain (first block)';
+title_name = 'Time domain (first block) 48kHz';
 figure('Name', title_name, 'NumberTitle', 'off');
 plot(t_block, input);
 xlabel('Time (s)');
@@ -44,7 +44,7 @@ fft_data = fft(input);
 
 % Plot N points FFT output block in frequency domain
 f_block = fs*(-N/2:N/2-1)/N;
-title_name = '|DFT Values|';
+title_name = '|DFT values|';
 figure('Name', title_name, 'NumberTitle', 'off');
 plot(f_block, abs(fftshift(fft_data)));
 xlim([-500 500]);
@@ -61,10 +61,11 @@ ifft_input_zeros=[I/D*fft_data(1:N/2)';zeros(N1-N,1);I/D*fft_data(N/2+1:N)'];
 ifft_data_zeros=ifft(ifft_input_zeros);
 
 % Plot N1 points output block in time domain
+[orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32.wav");
 t_block = (1/(I/D*fs))*(1:N1);
-title_name = 'Time Domain (first block resampled) | C_i=0';
+title_name = 'Time domain (first block resampled) 96kHz | C_i=0';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_block, real(ifft_data_zeros));
+plot(t_block, [real(ifft_data_zeros) orig_data(1:N1)]);
 ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
@@ -78,10 +79,11 @@ ifft_input_nonzeros=[I/D*fft_data(1:N/2)';filling';I/D*fft_data(N/2+1:N)'];
 ifft_data_nonzeros=ifft(ifft_input_nonzeros);
 
 % Plot N1 points output block in time domain
+[orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32.wav");
 t_block = (1/(I/D*fs))*(1:N1);
-title_name = 'Time Domain (first block resampled) | C_i=X(N/2)';
+title_name = 'Time domain (first block resampled) 96kHz | C_i=X(N/2)';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_block, real(ifft_data_nonzeros));
+plot(t_block, [real(ifft_data_nonzeros) orig_data(1:N1)]);
 ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
