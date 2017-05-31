@@ -3,6 +3,7 @@
 ## Requirements
 
 * [libsndfile](https://github.com/erikd/libsndfile)
+* [Boost](http://www.boost.org/)
 
 ## License
 Copyright (c) 2017 Matthieu Poullet
