@@ -7,6 +7,9 @@
 clear;
 close all;
 
+% We need the buffer function
+pkg load signal
+
 % Parameters
 I = 2;
 D = 1;
@@ -33,12 +36,26 @@ N1 = I/D*N;
 L = N/8;
 L1 = I/D*L;
 
-% Fake input data
-data = (0:1:length(data)-1);
+% Prepare input blocks with 2*L overlap
+fft_input = buffer(data, N, 2*L);
+% N points FFT
+fft_result = fft(fft_input);
+% Construct IFFT input
+filling = zeros(N1-N, size(fft_input, 2));
+ifft_input = [I/D*fft_result(1:N/2,:);filling;I/D*fft_result(N/2+1:N,:)];
+% N1 points IFFT
+ifft_result=real(ifft(ifft_input));
+% Remove both L1 points ends
+ifft_result_cut_overlap = ifft_result(L1+1:N1-L1,:);
+% Resampled data
+resampled_data = ifft_result_cut_overlap(:);
 
-% Prepend first block 2*L overlap
-%input = zeros(2*L,1);
-
-% Read a block of length N-2*L
-for i=1:fix(length(data)/(N-2*L))
-end
+% Plot resampled sound file in time domain
+t_all_resampled = (1/(I/D*fs))*(1:length(resampled_data));
+title_name = 'Time Domain (all samples)';
+figure('Name', title_name, 'NumberTitle', 'off');
+plot(t_all_resampled, resampled_data);
+xlabel('Time (s)');
+ylabel('Amplitude');
+ylim([-1 1]);
+title(title_name);
