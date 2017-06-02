@@ -47,9 +47,12 @@ L1 = I/D*L;
 fft_input = buffer(data, N, 2*L);
 % N points FFT
 fft_result = fft(fft_input);
-% Construct IFFT input
-filling = zeros(N1-N, size(fft_input, 2));
-ifft_input = [I/D*fft_result(1:N/2,:);filling;I/D*fft_result(N/2+1:N,:)];
+
+% Method 1
+
+% C_i = 0
+filling_zeros = zeros(N1-N, size(fft_input, 2));
+ifft_input = [I/D*fft_result(1:N/2,:);filling_zeros;I/D*fft_result(N/2+1:N,:)];
 % N1 points IFFT
 ifft_result=real(ifft(ifft_input));
 % Remove both L1 points ends
@@ -60,13 +63,37 @@ resampled_data = ifft_result_cut_overlap(:);
 % Plot resampled sound file in time domain
 [orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32_long.wav");
 t_all_resampled = (1/(I/D*fs))*(1:length(orig_data));
-title_name = 'Time Domain (resampled) 96kHz';
+title_name = 'Time Domain (resampled) 96kHz | C_i=0';
 figure('Name', title_name, 'NumberTitle', 'off');
 plot(t_all_resampled, [ resampled_data(1:length(orig_data)) orig_data(1:length(orig_data)) ]);
 xlabel('Time (s)');
 ylabel('Amplitude');
 ylim([-1 1]);
 title(title_name);
+
+% Method 2
+
+% C_i = X(N/2)
+filling_nonzeros = bsxfun(@times, ones(N1-N, size(fft_input, 2)), fft_result(N/2,:));
+ifft_input = [I/D*fft_result(1:N/2,:);filling_nonzeros;I/D*fft_result(N/2+1:N,:)];
+% N1 points IFFT
+ifft_result=real(ifft(ifft_input));
+% Remove both L1 points ends
+ifft_result_cut_overlap = ifft_result(L1+1:N1-L1,:);
+% Resampled data
+resampled_data = ifft_result_cut_overlap(:);
+
+% Plot resampled sound file in time domain
+[orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32_long.wav");
+t_all_resampled = (1/(I/D*fs))*(1:length(orig_data));
+title_name = 'Time Domain (resampled) 96kHz | C_i=X(N/2)';
+figure('Name', title_name, 'NumberTitle', 'off');
+plot(t_all_resampled, [ resampled_data(1:length(orig_data)) orig_data(1:length(orig_data)) ]);
+xlabel('Time (s)');
+ylabel('Amplitude');
+ylim([-1 1]);
+title(title_name);
+
 
 % Print all samples of a vector along with their index
 %for k=1:length(resampled_data)
