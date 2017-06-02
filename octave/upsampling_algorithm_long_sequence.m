@@ -8,11 +8,14 @@ clear;
 close all;
 
 % We need the buffer function
+
 % Octave:
 % sudo apt-get install liboctave-dev
+if isOctave
 % pkg install -forge control
 % pkg install -forge signal
 pkg load signal
+end
 
 % Parameters
 I = 2;
