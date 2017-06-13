@@ -3,6 +3,9 @@
 # https://stackoverflow.com/a/16346321
 create_bin_dir:=$(shell mkdir -p bin)
 
+# https://stackoverflow.com/q/24005166
+MAKEFLAGS += --silent
+
 CC=gcc
 CXX=g++
 CPPFLAGS=-I ../kiss_fft130/tools/ -I ../kiss_fft130/ -Wall -Wextra -Werror -pedantic 
@@ -10,13 +13,12 @@ CFLAGS=-std=c11
 CXXFLAGS=-std=c++14
 LIBS=-lm
 
+# the macros $@ and $^ are the left and right sides of the :
 %.o: %.c
 	$(CC) -c -o $@ $< $(CPPFLAGS) $(CFLAGS)
 
 %.o: %.cc
 	$(CXX) -c -o $@ $< $(CPPFLAGS) $(CXXFLAGS)
-
-# the macros $@ and $^ are the left and right sides of the :
 
 all: complex_valued_fwd_fft_floats real_valued_fwd_fft_floats kissfft_cpp kissfft_cpp_raii
 
