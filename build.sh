@@ -11,25 +11,23 @@ clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -o make_sine make_sine.cc -ls
 g++     -std=c++14 -Wall -Wextra -Werror -pedantic -o command_line command_line.cc -lboost_program_options -lboost_system -lboost_filesystem -lsndfile -lm
 clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -o command_line command_line.cc -lboost_program_options -lboost_system -lboost_filesystem -lsndfile -lm
 
-# block_processing and test_fft
+# block_processing
+
+KissFFT_DIR="KissFFT/kiss_fft130"
 
 ## GNU
 ## Step 1: build Kiss FFT object files
-gcc -std=c11 -Wall -Wextra -Werror -pedantic -I kiss_fft130/                      -c kiss_fft130/kiss_fft.c
-gcc -std=c11 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft130/tools -c kiss_fft130/tools/kiss_fftr.c
+gcc -std=c11 -Wall -Wextra -Werror -pedantic -I ${KissFFT_DIR}                         -c ${KissFFT_DIR}/kiss_fft.c
+gcc -std=c11 -Wall -Wextra -Werror -pedantic -I ${KissFFT_DIR} -I ${KissFFT_DIR}/tools -c ${KissFFT_DIR}/tools/kiss_fftr.c
 # Step 2: build block_processing
-g++ -std=c++14 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft130/tools/ -o block_processing kiss_fft.o kiss_fftr.o block_processing.cc -lsndfile
-# Step 3: build test_fft
-g++ -std=c++14 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft130/tools/ -o test_fft kiss_fft.o kiss_fftr.o test_fft.cc -lm
+g++ -std=c++14 -Wall -Wextra -Werror -pedantic -I ${KissFFT_DIR} -I ${KissFFT_DIR}/tools/ -o block_processing kiss_fft.o kiss_fftr.o block_processing.cc -lsndfile
 
 ## Clang
 ## Step 1: build Kiss FFT object files
-clang -std=c11 -Wall -Wextra -Werror -pedantic -I kiss_fft130/                      -c kiss_fft130/kiss_fft.c
-clang -std=c11 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft130/tools -c kiss_fft130/tools/kiss_fftr.c
+clang -std=c11 -Wall -Wextra -Werror -pedantic -I ${KissFFT_DIR}                         -c ${KissFFT_DIR}/kiss_fft.c
+clang -std=c11 -Wall -Wextra -Werror -pedantic -I ${KissFFT_DIR} -I ${KissFFT_DIR}/tools -c ${KissFFT_DIR}/tools/kiss_fftr.c
 # Step 2: build block_processing
-clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft130/tools/ -o block_processing kiss_fft.o kiss_fftr.o block_processing.cc -lsndfile
-# Step 3: build test_fft
-clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -I kiss_fft130/ -I kiss_fft130/tools/ -o test_fft kiss_fft.o kiss_fftr.o test_fft.cc -lm
+clang++ -std=c++14 -Wall -Wextra -Werror -pedantic -I ${KissFFT_DIR}/ -I ${KissFFT_DIR}/tools/ -o block_processing kiss_fft.o kiss_fftr.o block_processing.cc -lsndfile
 
 # cppcheck
 cppcheck --enable=all --suppress=missingIncludeSystem *.cc *.c
