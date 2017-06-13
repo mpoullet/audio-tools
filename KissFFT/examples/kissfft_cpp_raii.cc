@@ -34,10 +34,10 @@ int main()
     std::array<kiss_fft_cpx, N> in;
     std::array<kiss_fft_cpx, N> out;
 
+    printf("Ones (complex)\n");
     for (size_t i=0; i < N; ++i) {
-        in[i].r = i;
+        in[i].r = 1;
         in[i].i = 0.0;
-        //std::cout << in[i].r << "," << in[i].i << "\n";
     }
 
     // RAII without default_delete
