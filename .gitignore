@@ -6,3 +6,4 @@ block_processing
 *.swp
 *.o
 octave-workspace
+KissFFT/examples/bin
