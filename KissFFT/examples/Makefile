@@ -1,3 +1,8 @@
+# Makefile to build Kiss FFT examples
+
+# https://stackoverflow.com/a/16346321
+create_bin_dir:=$(shell mkdir -p bin)
+
 CC=gcc
 CXX=g++
 CPPFLAGS=-I ../kiss_fft130/tools/ -I ../kiss_fft130/ -Wall -Wextra -Werror -pedantic 
@@ -16,18 +21,18 @@ LIBS=-lm
 all: complex_valued_fwd_fft_floats real_valued_fwd_fft_floats kissfft_cpp kissfft_cpp_raii
 
 complex_valued_fwd_fft_floats: complex_valued_fwd_fft_floats.o ../kiss_fft130/kiss_fft.o
-	$(CC) -o $@ $^ $(CPPFLAGS) $(CFLAGS) $(LIBS)
+	$(CC) -o bin/$@ $^ $(CPPFLAGS) $(CFLAGS) $(LIBS)
 
 real_valued_fwd_fft_floats: real_valued_fwd_fft_floats.o ../kiss_fft130/kiss_fft.o ../kiss_fft130/tools/kiss_fftr.o
-	$(CC) -o $@ $^ $(CPPFLAGS) $(CFLAGS) $(LIBS)
+	$(CC) -o bin/$@ $^ $(CPPFLAGS) $(CFLAGS) $(LIBS)
 
 kissfft_cpp: kissfft_cpp.o ../kiss_fft130/kiss_fft.o
-	$(CXX) -o $@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+	$(CXX) -o bin/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 kissfft_cpp_raii: kissfft_cpp_raii.o ../kiss_fft130/kiss_fft.o
-	$(CXX) -o $@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+	$(CXX) -o bin/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 .PHONY: clean
 
 clean:
-	rm -f *.o complex_valued_fwd_fft_floats real_valued_fwd_fft_floats kissfft_cpp kissfft_cpp_rai
+	rm -rf *.o bin/*
