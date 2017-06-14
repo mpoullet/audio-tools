@@ -1,7 +1,9 @@
 # Makefile to build Kiss FFT examples
 
 # https://stackoverflow.com/a/16346321
-create_bin_dir := $(shell mkdir -p bin)
+create_bin_dir := $(shell mkdir -p ../bin)
+
+BINDIR := ../bin
 
 CC ?= gcc
 CXX ?= g++
@@ -19,18 +21,18 @@ all: make_sine command_line block_processing
 # $< is the name of the first prerequisite.
 make_sine: make_sine.o
 	@echo "LD $@"
-	$(CXX) -o bin/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 command_line: command_line.o
 	@echo "LD $@"
-	$(CXX) -o bin/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 block_processing: block_processing.o ../KissFFT/kiss_fft130/kiss_fft.o ../KissFFT/kiss_fft130/tools/kiss_fftr.o
 	@echo "LD $@"
-	$(CXX) -o bin/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 clean:
-	rm -rf *.o bin/*
+	rm -rf *.o $(BINDIR)/*
 
 %.o: %.c
 	@echo "CC $<"
