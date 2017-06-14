@@ -7,7 +7,7 @@
 int main() {
     constexpr double pi = 3.14159265358979323846264338;
     constexpr double freq = 440.0;
-    constexpr double duration = 1;
+    constexpr double duration = 1.0;
     constexpr int samplerate = 48000;
     constexpr double sample_duration = 1.0/samplerate;
     constexpr int sample_count = samplerate * duration;
