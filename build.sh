@@ -4,6 +4,8 @@
 set -e
 set -u
 
+param1=${1:-}
+
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 
@@ -23,7 +25,9 @@ find ./KissFFT/examples/ ./src \( -name "*.c" -o -name "*.cc" \) -exec cppcheck 
     -I KissFFT/kiss_fft130/ \
     -I KissFFT/kiss_fft130/tools/ {} +
 
-echo -e "${YELLOW}Running...${NOCOLOR}"
-#bin/make_sine
-#bin/command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
-#bin/block_processing
+if [ "$param1" == "--run" ]; then
+    echo -e "${YELLOW}Running...${NOCOLOR}"
+    #bin/make_sine
+    bin/command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
+    bin/block_processing
+fi
