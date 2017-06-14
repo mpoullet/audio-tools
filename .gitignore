@@ -1,9 +1,7 @@
-make_sine
-command_line
-block_processing
 *.png
 *.wav
 *.swp
 *.o
 octave-workspace
 KissFFT/examples/bin
+bin/
