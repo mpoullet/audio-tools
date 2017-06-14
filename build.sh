@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #set -x
 set -e
@@ -7,23 +7,23 @@ set -u
 YELLOW='\033[1;33m'
 NOCOLOR='\033[0m'
 
-echo "${YELLOW}Building with gcc/g++...${NOCOLOR}"
+echo -e "${YELLOW}Building with gcc/g++...${NOCOLOR}"
 CC=gcc   CXX=g++     make -C KissFFT/examples clean all
 CC=clang CXX=clang++ make -C KissFFT/examples clean all
 
-echo "${YELLOW}Building with clang/clang++...${NOCOLOR}"
+echo -e "${YELLOW}Building with clang/clang++...${NOCOLOR}"
 CC=gcc   CXX=g++     make -C src clean all
 CC=clang CXX=clang++ make -C src clean all
 
-echo "${YELLOW}Checking C/C++ source code...${NOCOLOR}"
-find ./KissFFT/examples/ ./src -name *.c -o -name *.cc | xargs cppcheck \
+echo -e "${YELLOW}Checking C/C++ source code...${NOCOLOR}"
+find ./KissFFT/examples/ ./src \( -name "*.c" -o -name "*.cc" \) -exec cppcheck \
     --enable=all \
     --suppress=missingIncludeSystem \
     --check-config \
     -I KissFFT/kiss_fft130/ \
-    -I KissFFT/kiss_fft130/tools/
+    -I KissFFT/kiss_fft130/tools/ {} +
 
-echo "${YELLOW}Running...${NOCOLOR}"
+echo -e "${YELLOW}Running...${NOCOLOR}"
 #bin/make_sine
-bin/command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
-bin/block_processing
+#bin/command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
+#bin/block_processing
