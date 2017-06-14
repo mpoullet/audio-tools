@@ -1,4 +1,4 @@
-#include <cstdio>
+#include <iostream>
 #include <cmath>
 #include <array>
 
@@ -12,16 +12,17 @@ int main() {
     constexpr double sample_duration = 1.0/samplerate;
     constexpr int sample_count = samplerate * duration;
 
-    printf("duration=%f\n", duration);
-    printf("samplerate=%d\n", samplerate);
-    printf("sample_count=%d\n", sample_count);
-    printf("sample_duration=%f\n", sample_duration);
-    printf("freq=%f\n", freq);
+    std::cout << "duration="        << duration << "\n";
+    std::cout << "samplerate="      << samplerate << "\n";
+    std::cout << "sample_count="    << sample_count << "\n";
+    std::cout << "sample_duration=" << sample_duration << "\n";
+    std::cout << "freq="            << freq;
+    std::cout << std::endl;
 
     std::array<double, sample_count> buffer;
     for (int k = 0; k < sample_count; k++) {
         buffer[k] = sin(freq * 2 * k * pi / samplerate);
-        printf("%d: %f: %f\n", k, sample_duration*k, buffer[k]);
+        //std::cout << k << ": " << sample_duration*k << ": " << buffer[k] << "\n";
     }
 
     SndfileHandle sndfilehandle_pcm32("sine32.wav", SFM_WRITE, (SF_FORMAT_WAV | SF_FORMAT_PCM_32), 1, samplerate);
