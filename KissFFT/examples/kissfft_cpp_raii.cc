@@ -1,4 +1,4 @@
-// Taken from: http://stackoverflow.com/a/14537855
+// See: http://stackoverflow.com/a/14537855
 
 #include <iostream>
 #include <complex>
