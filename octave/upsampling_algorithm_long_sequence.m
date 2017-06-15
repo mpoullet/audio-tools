@@ -7,13 +7,14 @@
 clear;
 close all;
 
-% We need the buffer function
+% We need the buffer function:
+% MATLAB => Signal Processing Toolbox (https://www.mathworks.com/help/signal/ref/buffer.html)
+% Octave => signal package
 
-% Octave:
-% sudo apt-get install liboctave-dev
 if isOctave
-% pkg install -forge control
-% pkg install -forge signal
+% (outside octave) sudo apt-get install liboctave-dev
+% (inside octave)  pkg install -forge control
+% (inside octave)  pkg install -forge signal
 pkg load signal
 end
 
