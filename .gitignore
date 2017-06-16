@@ -1,6 +1,7 @@
 *.png
 *.wav
 *.swp
+*.asc
 *.o
 octave-workspace
 KissFFT/examples/bin
