@@ -7,7 +7,7 @@
 #define kiss_fft_scalar float
 #include "kiss_fft.h"
 
-int main()
+int main(int argc, char *argv[])
 {
     const int I = 2;
     const int D = 1;
@@ -18,7 +18,9 @@ int main()
     kiss_fft_cfg fwd = kiss_fft_alloc(N, 0, NULL, NULL);
     kiss_fft_cfg inv = kiss_fft_alloc(M, 1, NULL, NULL);
 
-    const std::string infilename = "sine_48000_pcm32.wav";
+    if (argc != 2) return -1;
+
+    const std::string infilename = argv[argc-1];
     const std::string outfilename = "orig.wav";
     const std::string resfilename = "res.wav";
     SndfileHandle  infile(infilename);
