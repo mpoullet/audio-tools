@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     };
 
     if (fwd_cfg == nullptr || inv_cfg == nullptr) {
-        std::cerr << "Error allocating Kiss FFT configurations\n";
+        std::cerr << "Error allocating Kiss FFT configurations.\n";
     }
 
     // FFT input/output buffers
@@ -58,14 +58,14 @@ int main(int argc, char *argv[])
     for (int i=0; i < N; ++i) {
         fwd_fft_in_buffer[i].r = buffer[i];
         fwd_fft_in_buffer[i].i = 0.0;
-        std::cout << i << ": (" << fwd_fft_in_buffer[i].r << "," << fwd_fft_in_buffer[i].i << ")\n";
+        std::cout << i << " " << fwd_fft_in_buffer[i].r << " " << fwd_fft_in_buffer[i].i << "\n";
     }
     std::cout << "\n";
 
     // Forward N points FFT
     kiss_fft(fwd_cfg.get(), fwd_fft_in_buffer.data(), fwd_fft_out_buffer.data());
     for (int i=0; i < N; ++i) {
-        std::cout << " FFT: " << i << " (" << fwd_fft_out_buffer[i].r << "," << fwd_fft_out_buffer[i].i << ")\n";
+        std::cout << " FFT: " << i << " " << fwd_fft_out_buffer[i].r << " " << fwd_fft_out_buffer[i].i << "\n";
     }
 
     // Create IFFT input buffer
@@ -82,14 +82,15 @@ int main(int argc, char *argv[])
         bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N].i;
     }
     for (int i=0; i < M; ++i) {
-        std::cout << i << ": (" << bwd_fft_in_buffer[i].r << "," << bwd_fft_in_buffer[i].i << ")\n";
+        //std::cout << i << " " << bwd_fft_in_buffer[i].r << " " << bwd_fft_in_buffer[i].i << "\n";
     }
 
     // Backward M points IFFT
     kiss_fft(inv_cfg.get(), bwd_fft_in_buffer.data(), bwd_fft_out_buffer.data());
     for(int i=0; i < M; ++i) {
-        std::cout << "IFFT: " << i << " (" << bwd_fft_out_buffer[i].r << "," << bwd_fft_out_buffer[i].i << ")\n";
+        //std::cout << "IFFT: " << i << ": " << bwd_fft_out_buffer[i].r << "\n";
     }
 
+    kiss_fft_cleanup();
     return 0;
 }
