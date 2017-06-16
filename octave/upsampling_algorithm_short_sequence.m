@@ -4,6 +4,7 @@
 % Page(s): 140 - 144
 % DOI: 10.1109/MSP.2011.940413
 
+clc;
 clear;
 close all;
 
@@ -36,7 +37,7 @@ title(title_name);
 %
 
 % Plot N points input block in time domain
-input = data(1:N)';
+input = data(1:N);
 t_block = (1/fs)*(1:N);
 title_name = 'Time domain (first block) 48kHz';
 figure('Name', title_name, 'NumberTitle', 'off');
@@ -63,7 +64,7 @@ N1 = I/D*N;
 % Method 1
 
 % C_i = 0
-ifft_input_zeros=[I/D*fft_data(1:N/2)';zeros(N1-N,1);I/D*fft_data(N/2+1:N)'];
+ifft_input_zeros=[I/D*fft_data(1:N/2);zeros(N1-N,1);I/D*fft_data(N/2+1:N)];
 ifft_data_zeros=ifft(ifft_input_zeros);
 
 % Plot N1 points output block in time domain
@@ -80,8 +81,8 @@ title(title_name);
 % Method 2
 
 % C_i = X(N/2)
-filling(1:N1-N) = fft_data(N/2);
-ifft_input_nonzeros=[I/D*fft_data(1:N/2)';filling';I/D*fft_data(N/2+1:N)'];
+filling = ones(N1-N,1)*fft_data(N/2);
+ifft_input_nonzeros=[I/D*fft_data(1:N/2);filling;I/D*fft_data(N/2+1:N)];
 ifft_data_nonzeros=ifft(ifft_input_nonzeros);
 
 % Plot N1 points output block in time domain
@@ -94,4 +95,3 @@ ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
 title(title_name);
-
