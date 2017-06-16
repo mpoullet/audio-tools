@@ -1,0 +1,10 @@
+values = load('../src/ifft_input_values.asc');
+z = complex(values(:,2),values(:,3));
+disp([real(ifft(z)),real(ifft(ifft_input_zeros))])
+
+# https://de.mathworks.com/matlabcentral/answers/18151-fft-of-row-and-column-vectors-not-equal
+# You have to use .' (dot transpose)
+# If you use the tranpose operator on a complex-valued vector, matrix in MATLAB, it returns the conjugate transpose by default.
+
+x = randn(10,1);
+isequal(fft(x').',fft(x))
