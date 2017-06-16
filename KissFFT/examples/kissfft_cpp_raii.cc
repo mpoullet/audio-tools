@@ -25,7 +25,7 @@ namespace std {
     class default_delete<std::remove_pointer<kiss_fft_cfg>::type>
     {
         public:
-            void operator()(std::remove_pointer<kiss_fft_cfg>::type *p) { std::free(p); }
+            void operator()(std::remove_pointer<kiss_fft_cfg>::type *p) { kiss_fft_free(p); }
     };
 }
 
@@ -41,9 +41,9 @@ int main()
     }
 
     // RAII without default_delete
-    auto cfg1 = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(std::free) *> {
+    auto cfg1 = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, NULL, NULL),
-        std::free
+        kiss_fft_free
     };
 
     // RAII with default delete
