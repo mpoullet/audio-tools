@@ -12,7 +12,7 @@ CFLAGS := -std=c11
 CXXFLAGS := -std=c++14
 LIBS := -lm -lsndfile -lboost_program_options -lboost_system -lboost_filesystem
 
-all: make_sine command_line block_processing
+all: make_sine command_line upsampling_algorithm_short_sequence upsampling_algorithm_long_sequence
 .PHONY: all clean
 
 # Automatic variables: https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
@@ -27,7 +27,11 @@ command_line: command_line.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
-block_processing: block_processing.o ../KissFFT/kiss_fft130/kiss_fft.o ../KissFFT/kiss_fft130/tools/kiss_fftr.o
+upsampling_algorithm_short_sequence: upsampling_algorithm_short_sequence.o ../KissFFT/kiss_fft130/kiss_fft.o ../KissFFT/kiss_fft130/tools/kiss_fftr.o
+	@echo "LD $@"
+	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+
+upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o ../KissFFT/kiss_fft130/kiss_fft.o ../KissFFT/kiss_fft130/tools/kiss_fftr.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
