@@ -4,6 +4,7 @@
 % Page(s): 140 - 144
 % DOI: 10.1109/MSP.2011.940413
 
+clc;
 clear;
 close all;
 
