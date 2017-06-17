@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -7,6 +8,16 @@
 
 #define kiss_fft_scalar float
 #include "kiss_fft.h"
+
+// https://stackoverflow.com/a/2284805/496459
+template <typename Stream>
+void reopen(Stream& pStream, const char * pFile,
+            std::ios_base::openmode pMode = std::ios_base::out)
+{
+    pStream.close();
+    pStream.clear();
+    pStream.open(pFile, pMode);
+}
 
 int main(int argc, char *argv[])
 {
@@ -55,20 +66,22 @@ int main(int argc, char *argv[])
     std::vector<kiss_fft_cpx> bwd_fft_out_buffer(M);
 
     // Create FFT input buffer
+    std::ofstream ofs("fft_input_buffer.asc");
     for (int i=0; i < N; ++i) {
         fwd_fft_in_buffer[i].r = buffer[i];
         fwd_fft_in_buffer[i].i = 0.0;
-        std::cout << i << " " << fwd_fft_in_buffer[i].r << " " << fwd_fft_in_buffer[i].i << "\n";
+        ofs << i << " " << fwd_fft_in_buffer[i].r << " " << fwd_fft_in_buffer[i].i << "\n";
     }
-    std::cout << "\n";
 
     // Forward N points FFT
+    reopen(ofs, "fft_output_buffer.asc");
     kiss_fft(fwd_cfg.get(), fwd_fft_in_buffer.data(), fwd_fft_out_buffer.data());
     for (int i=0; i < N; ++i) {
-        std::cout << " FFT: " << i << " " << fwd_fft_out_buffer[i].r << " " << fwd_fft_out_buffer[i].i << "\n";
+        ofs << i << " " << fwd_fft_out_buffer[i].r << " " << fwd_fft_out_buffer[i].i << "\n";
     }
 
     // Create IFFT input buffer
+    reopen(ofs, "ifft_input_buffer.asc");
     for (int i=0; i < N/2; ++i) {
         bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i].r;
         bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i].i;
@@ -82,13 +95,16 @@ int main(int argc, char *argv[])
         bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N].i;
     }
     for (int i=0; i < M; ++i) {
-        //std::cout << i << " " << bwd_fft_in_buffer[i].r << " " << bwd_fft_in_buffer[i].i << "\n";
+        ofs << i << " " << bwd_fft_in_buffer[i].r << " " << bwd_fft_in_buffer[i].i << "\n";
     }
 
     // Backward M points IFFT
+    reopen(ofs, "ifft_output_buffer.asc");
     kiss_fft(inv_cfg.get(), bwd_fft_in_buffer.data(), bwd_fft_out_buffer.data());
     for(int i=0; i < M; ++i) {
-        //std::cout << "IFFT: " << i << ": " << bwd_fft_out_buffer[i].r << "\n";
+        bwd_fft_out_buffer[i].r = 1.0/M * bwd_fft_out_buffer[i].r;
+        bwd_fft_out_buffer[i].i = 1.0/M * bwd_fft_out_buffer[i].i;
+        ofs << i << " " << bwd_fft_out_buffer[i].r << " " << bwd_fft_out_buffer[i].i << "\n";
     }
 
     kiss_fft_cleanup();
