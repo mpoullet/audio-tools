@@ -37,23 +37,23 @@ title(title_name);
 %
 
 % Plot N points input block in time domain
-input = data(1:N);
+fft_input_data = data(1:N);
 t_block = (1/fs)*(1:N);
 title_name = 'Time domain (first block) 48kHz';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_block, input);
+plot(t_block, fft_input_data);
 xlabel('Time (s)');
 ylabel('Amplitude');
 title(title_name);
 
 % FFT
-fft_data = fft(input);
+fft_output_data = fft(fft_input_data);
 
 % Plot N points FFT output block in frequency domain
 f_block = fs*(-N/2:N/2-1)/N;
 title_name = '|DFT values|';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(f_block, abs(fftshift(fft_data)));
+plot(f_block, abs(fftshift(fft_output_data)));
 xlim([-500 500]);
 xlabel('Frequency (Hz)');
 ylabel('|DFT Values|');
@@ -64,15 +64,15 @@ N1 = I/D*N;
 % Method 1
 
 % C_i = 0
-ifft_input_zeros=[I/D*fft_data(1:N/2);zeros(N1-N,1);I/D*fft_data(N/2+1:N)];
-ifft_data_zeros=ifft(ifft_input_zeros);
+ifft_input_data_zeros=[I/D*fft_output_data(1:N/2);zeros(N1-N,1);I/D*fft_output_data(N/2+1:N)];
+ifft_output_data_zeros=ifft(ifft_input_data_zeros);
 
 % Plot N1 points output block in time domain
 [orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32_short.wav");
 t_block = (1/(I/D*fs))*(1:N1);
 title_name = 'Time domain (first block resampled) 96kHz | C_i=0';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_block, [real(ifft_data_zeros) orig_data(1:N1)]);
+plot(t_block, [real(ifft_output_data_zeros) orig_data(1:N1)]);
 ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
@@ -81,16 +81,16 @@ title(title_name);
 % Method 2
 
 % C_i = X(N/2)
-filling = ones(N1-N,1)*fft_data(N/2);
-ifft_input_nonzeros=[I/D*fft_data(1:N/2);filling;I/D*fft_data(N/2+1:N)];
-ifft_data_nonzeros=ifft(ifft_input_nonzeros);
+filling = ones(N1-N,1)*fft_output_data(N/2);
+ifft_input_data_nonzeros=[I/D*fft_output_data(1:N/2);filling;I/D*fft_output_data(N/2+1:N)];
+ifft_output_data_nonzeros=ifft(ifft_input_data_nonzeros);
 
 % Plot N1 points output block in time domain
 [orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32_short.wav");
 t_block = (1/(I/D*fs))*(1:N1);
 title_name = 'Time domain (first block resampled) 96kHz | C_i=X(N/2)';
 figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_block, [real(ifft_data_nonzeros) orig_data(1:N1)]);
+plot(t_block, [real(ifft_output_data_nonzeros) orig_data(1:N1)]);
 ylim([-1 1]);
 xlabel('Time (s)');
 ylabel('Amplitude');
