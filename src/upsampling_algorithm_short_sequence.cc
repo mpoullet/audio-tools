@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
+#include <complex>
 
 #include <sndfile.hh>
 
@@ -58,53 +60,52 @@ int main(int argc, char *argv[])
     }
 
     // FFT input/output buffers
-    std::vector<kiss_fft_cpx> fwd_fft_in_buffer(N);
-    std::vector<kiss_fft_cpx> fwd_fft_out_buffer(N);
+    std::vector<std::complex<kiss_fft_scalar>> fwd_fft_in_buffer(N);
+    std::vector<std::complex<kiss_fft_scalar>> fwd_fft_out_buffer(N);
 
     // IFFT input/output buffers
-    std::vector<kiss_fft_cpx> bwd_fft_in_buffer(M);
-    std::vector<kiss_fft_cpx> bwd_fft_out_buffer(M);
+    std::vector<std::complex<kiss_fft_scalar>> bwd_fft_in_buffer(M);
+    std::vector<std::complex<kiss_fft_scalar>> bwd_fft_out_buffer(M);
 
     // Create FFT input buffer
     std::ofstream ofs("fft_input_buffer.asc");
     for (int i=0; i < N; ++i) {
-        fwd_fft_in_buffer[i].r = buffer[i];
-        fwd_fft_in_buffer[i].i = 0.0;
-        ofs << i << " " << fwd_fft_in_buffer[i].r << " " << fwd_fft_in_buffer[i].i << "\n";
+        fwd_fft_in_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i], 0.0);
+        ofs << i << " " << fwd_fft_in_buffer[i].real() << " " << fwd_fft_in_buffer[i].imag() << "\n";
     }
 
     // Forward N points FFT
     reopen(ofs, "fft_output_buffer.asc");
-    kiss_fft(fwd_cfg.get(), fwd_fft_in_buffer.data(), fwd_fft_out_buffer.data());
+    kiss_fft(fwd_cfg.get(), (kiss_fft_cpx*)(fwd_fft_in_buffer.data()), (kiss_fft_cpx*)(fwd_fft_out_buffer.data()));
     for (int i=0; i < N; ++i) {
-        ofs << i << " " << fwd_fft_out_buffer[i].r << " " << fwd_fft_out_buffer[i].i << "\n";
+        ofs << i << " " << fwd_fft_out_buffer[i].real() << " " << fwd_fft_out_buffer[i].imag() << "\n";
     }
 
     // Create IFFT input buffer
     reopen(ofs, "ifft_input_buffer.asc");
     for (int i=0; i < N/2; ++i) {
-        bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i].r;
-        bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i].i;
+        bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i];
     }
     for (int i=N/2; i < M - N/2; ++i) {
-        bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * 0.0;
-        bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * 0.0;
+        bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * std::complex<kiss_fft_scalar>(0.0, 0.0);
     }
     for (int i=M - N/2; i < M; ++i) {
-        bwd_fft_in_buffer[i].r = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N].r;
-        bwd_fft_in_buffer[i].i = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N].i;
+        bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N];
     }
     for (int i=0; i < M; ++i) {
-        ofs << i << " " << bwd_fft_in_buffer[i].r << " " << bwd_fft_in_buffer[i].i << "\n";
+        ofs << i << " " << bwd_fft_in_buffer[i].real() << " " << bwd_fft_in_buffer[i].imag() << "\n";
     }
 
     // Backward M points IFFT
     reopen(ofs, "ifft_output_buffer.asc");
-    kiss_fft(inv_cfg.get(), bwd_fft_in_buffer.data(), bwd_fft_out_buffer.data());
+    kiss_fft(inv_cfg.get(), (kiss_fft_cpx*)(bwd_fft_in_buffer.data()), (kiss_fft_cpx*)(bwd_fft_out_buffer.data()));
+    /*
+    std::transform(bwd_fft_out_buffer.begin(), bwd_fft_out_buffer.end(),
+                   bwd_fft_out_buffer.begin(), std::bind1st(std::multiplies<kiss_fft_scalar>(), 1.0/M));
+    */
     for(int i=0; i < M; ++i) {
-        bwd_fft_out_buffer[i].r = 1.0/M * bwd_fft_out_buffer[i].r;
-        bwd_fft_out_buffer[i].i = 1.0/M * bwd_fft_out_buffer[i].i;
-        ofs << i << " " << bwd_fft_out_buffer[i].r << " " << bwd_fft_out_buffer[i].i << "\n";
+        bwd_fft_out_buffer[i] = static_cast<kiss_fft_scalar>(1.0/M) * bwd_fft_out_buffer[i];
+        ofs << i << " " << bwd_fft_out_buffer[i].real() << " " << bwd_fft_out_buffer[i].imag() << "\n";
     }
 
     kiss_fft_cleanup();
