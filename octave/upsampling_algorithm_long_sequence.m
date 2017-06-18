@@ -25,7 +25,7 @@ D = 1;
 N = 256;
 
 % WAV file input
-[data, fs, nbits] = wavread("sine_48000_pcm32_long.wav");
+[data, fs, nbits] = wavread('sine_48000_pcm32_long.wav');
 sample_counts = length(data);
 
 % Plot sound file in time domain
@@ -63,7 +63,7 @@ ifft_result_cut_overlap = ifft_result(L1+1:N1-L1,:);
 resampled_data = ifft_result_cut_overlap(:);
 
 % Plot resampled sound file in time domain
-[orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32_long.wav");
+[orig_data, orig_fs, orig_nbits] = wavread('sine_96000_pcm32_long.wav');
 t_all_resampled = (1/(I/D*fs))*(1:length(orig_data));
 title_name = 'Time Domain (resampled) 96kHz | C_i=0';
 figure('Name', title_name, 'NumberTitle', 'off');
@@ -86,7 +86,7 @@ ifft_result_cut_overlap = ifft_result(L1+1:N1-L1,:);
 resampled_data = ifft_result_cut_overlap(:);
 
 % Plot resampled sound file in time domain
-[orig_data, orig_fs, orig_nbits] = wavread("sine_96000_pcm32_long.wav");
+[orig_data, orig_fs, orig_nbits] = wavread('sine_96000_pcm32_long.wav');
 t_all_resampled = (1/(I/D*fs))*(1:length(orig_data));
 title_name = 'Time Domain (resampled) 96kHz | C_i=X(N/2)';
 figure('Name', title_name, 'NumberTitle', 'off');
