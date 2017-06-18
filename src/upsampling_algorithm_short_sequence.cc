@@ -99,8 +99,10 @@ int main(int argc, char *argv[])
     // Backward M points IFFT
     reopen(ofs, "ifft_output_buffer.asc");
     kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(bwd_fft_in_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(bwd_fft_out_buffer.data()));
+    std::transform(bwd_fft_out_buffer.begin(), bwd_fft_out_buffer.end(),
+                   bwd_fft_out_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0/M ));
+
     for(int i=0; i < M; ++i) {
-        bwd_fft_out_buffer[i] = static_cast<kiss_fft_scalar>(1.0/M) * bwd_fft_out_buffer[i];
         ofs << i << " " << bwd_fft_out_buffer[i].real() << " " << bwd_fft_out_buffer[i].imag() << "\n";
     }
 
