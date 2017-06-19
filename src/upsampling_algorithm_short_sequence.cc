@@ -80,9 +80,6 @@ int main(int argc, char *argv[])
     for (int i=0; i < N/2; ++i) {
         ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i];
     }
-    for (int i=N/2; i < M - N/2; ++i) {
-        ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * std::complex<kiss_fft_scalar>(0.0, 0.0);
-    }
     for (int i=M - N/2; i < M; ++i) {
         ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i - N];
     }
