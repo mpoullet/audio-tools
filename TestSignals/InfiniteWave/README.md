@@ -1,0 +1,5 @@
+[FAQ](http://src.infinitewave.ca/faq.html)
+
+## How can I contribute to the test?
+
+If you have the opportunity to run our test files through a piece of software or hardware device that is of general public interest, we can add your results to this web-site. Take our set of test files from http://src.infinitewave.ca/TestSignals.zip. It contains 3 types of test signals at 96 kHz: a pulse train, a sine chirp, and a stereo tone. Each signal is presented in 3 different resolutions: 32-bit int, 32-bit float, and 24-bit int (listed in order of preference from high to low). Select the highest resolution that your SRC can handle and run the 3 test files through the SRC to convert them to 44.1 kHz. If your SRC has different presets for quality, select the best one or a couple of different ones – we’ll be unable to publish too many results for each SRC. During the conversion please pay attention to the fact that one of the test signals is stereo. Send the converted results as uncompressed WAV or AIFF files in a ZIP archive to src (at) infinitewave (dot) ca, and we’ll generate the graphs and publish them in a few days.
