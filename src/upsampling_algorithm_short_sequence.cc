@@ -56,16 +56,16 @@ int main(int argc, char *argv[])
 
     // FFT input/output buffers
     std::vector<std::complex<kiss_fft_scalar>> fft_input_buffer(N);
-    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(N);
+    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(fft_input_buffer.size());
 
     // IFFT input/output buffers
     std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M);
-    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(M);
+    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(ifft_input_buffer.size());
 
     // Create FFT input buffer
-    for (int i=0; i < N; ++i) {
-        fft_input_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i]);
-    }
+    std::transform(buffer.begin(), buffer.end(),
+                   fft_input_buffer.begin(),
+                   [](kiss_fft_scalar real) { return std::complex<kiss_fft_scalar>(real); });
 
     std::ofstream fft_input_buffer_file("fft_input_buffer.asc");
     std::copy(fft_input_buffer.begin(), fft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(fft_input_buffer_file, "\n"));
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     std::copy(fft_output_buffer.begin(),       fft_output_buffer.begin() + N/2, ifft_input_buffer.begin());
     std::copy(fft_output_buffer.begin() + N/2, fft_output_buffer.end(),         ifft_input_buffer.end() - N/2);
     std::transform(ifft_input_buffer.begin(), ifft_input_buffer.end(),
-                   ifft_input_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0*I/D ));
+                   ifft_input_buffer.begin(), std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(),  1.0*I/D ));
 
     std::ofstream ifft_input_buffer_file("ifft_input_buffer.asc");
     std::copy(ifft_input_buffer.begin(), ifft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_input_buffer_file, "\n"));
@@ -88,7 +88,8 @@ int main(int argc, char *argv[])
     // Backward M points IFFT
     kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer.data()));
     std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
-                   ifft_output_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0/M ));
+                   ifft_output_buffer.begin(),
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(),  1.0/M ));
 
     std::ofstream ifft_output_buffer_file("ifft_output_buffer.asc");
     std::copy(ifft_output_buffer.begin(), ifft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_output_buffer_file, "\n"));
