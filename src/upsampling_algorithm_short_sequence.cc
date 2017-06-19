@@ -68,21 +68,24 @@ int main(int argc, char *argv[])
     std::vector<std::complex<kiss_fft_scalar>> bwd_fft_out_buffer(M);
 
     // Create FFT input buffer
-    std::ofstream ofs("fft_input_buffer.asc");
     for (int i=0; i < N; ++i) {
         fwd_fft_in_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i]);
+    }
+
+    std::ofstream ofs("fft_input_buffer.asc");
+    for (int i=0; i < N; ++i) {
         ofs << i << " " << fwd_fft_in_buffer[i].real() << " " << fwd_fft_in_buffer[i].imag() << "\n";
     }
 
     // Forward N points FFT
-    reopen(ofs, "fft_output_buffer.asc");
     kiss_fft(fwd_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(fwd_fft_in_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(fwd_fft_out_buffer.data()));
+
+    reopen(ofs, "fft_output_buffer.asc");
     for (int i=0; i < N; ++i) {
         ofs << i << " " << fwd_fft_out_buffer[i].real() << " " << fwd_fft_out_buffer[i].imag() << "\n";
     }
 
     // Create IFFT input buffer
-    reopen(ofs, "ifft_input_buffer.asc");
     for (int i=0; i < N/2; ++i) {
         bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i];
     }
@@ -92,16 +95,18 @@ int main(int argc, char *argv[])
     for (int i=M - N/2; i < M; ++i) {
         bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N];
     }
+
+    reopen(ofs, "ifft_input_buffer.asc");
     for (int i=0; i < M; ++i) {
         ofs << i << " " << bwd_fft_in_buffer[i].real() << " " << bwd_fft_in_buffer[i].imag() << "\n";
     }
 
     // Backward M points IFFT
-    reopen(ofs, "ifft_output_buffer.asc");
     kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(bwd_fft_in_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(bwd_fft_out_buffer.data()));
     std::transform(bwd_fft_out_buffer.begin(), bwd_fft_out_buffer.end(),
                    bwd_fft_out_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0/M ));
 
+    reopen(ofs, "ifft_output_buffer.asc");
     for(int i=0; i < M; ++i) {
         ofs << i << " " << bwd_fft_out_buffer[i].real() << " " << bwd_fft_out_buffer[i].imag() << "\n";
     }
