@@ -34,8 +34,8 @@ int main(int argc, char *argv[])
     SndfileHandle output_file(output_filename, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
 
     // Input data
-    std::vector<kiss_fft_scalar> buffer(N);
-    if (input_file.read(buffer.data(), N) != N) {
+    std::vector<kiss_fft_scalar> input_buffer(N);
+    if (input_file.read(input_buffer.data(), N) != N) {
         std::cerr << "Error reading " << N << " samples from " << input_filename << ".\n";
     }
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(ifft_input_buffer.size());
 
     // Create FFT input buffer
-    std::transform(buffer.begin(), buffer.end(),
+    std::transform(input_buffer.begin(), input_buffer.end(),
                    fft_input_buffer.begin(),
                    [](kiss_fft_scalar real) { return std::complex<kiss_fft_scalar>(real); });
 
@@ -93,6 +93,13 @@ int main(int argc, char *argv[])
 
     std::ofstream ifft_output_buffer_file("ifft_output_buffer.asc");
     std::copy(ifft_output_buffer.begin(), ifft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_output_buffer_file, "\n"));
+
+    // Store upsampled samples
+    std::vector<kiss_fft_scalar> output_buffer(ifft_output_buffer.size());
+    std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
+            output_buffer.begin(),
+            [](std::complex<kiss_fft_scalar> cpx) { return cpx.real(); });
+    output_file.write(output_buffer.data(), output_buffer.size());
 
     kiss_fft_cleanup();
     return 0;
