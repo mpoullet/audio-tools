@@ -80,7 +80,8 @@ int main(int argc, char *argv[])
     std::copy(fft_output_buffer.begin(),       fft_output_buffer.begin() + N/2, ifft_input_buffer.begin());
     std::copy(fft_output_buffer.begin() + N/2, fft_output_buffer.end(),         ifft_input_buffer.end() - N/2);
     std::transform(ifft_input_buffer.begin(), ifft_input_buffer.end(),
-                   ifft_input_buffer.begin(), std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(),  1.0*I/D ));
+                   ifft_input_buffer.begin(),
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0*I/D));
 
     std::ofstream ifft_input_buffer_file("ifft_input_buffer.asc");
     std::copy(ifft_input_buffer.begin(), ifft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_input_buffer_file, "\n"));
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
     kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer.data()));
     std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
                    ifft_output_buffer.begin(),
-                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(),  1.0/M ));
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
 
     std::ofstream ifft_output_buffer_file("ifft_output_buffer.asc");
     std::copy(ifft_output_buffer.begin(), ifft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_output_buffer_file, "\n"));
@@ -97,8 +98,8 @@ int main(int argc, char *argv[])
     // Store upsampled samples
     std::vector<kiss_fft_scalar> output_buffer(ifft_output_buffer.size());
     std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
-            output_buffer.begin(),
-            [](std::complex<kiss_fft_scalar> cpx) { return cpx.real(); });
+                   output_buffer.begin(),
+                   [](std::complex<kiss_fft_scalar> cpx) { return cpx.real(); });
     output_file.write(output_buffer.data(), output_buffer.size());
 
     kiss_fft_cleanup();
