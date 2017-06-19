@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <functional>
 #include <complex>
+#include <iterator>
 
 #include <sndfile.hh>
 
@@ -60,56 +61,48 @@ int main(int argc, char *argv[])
     }
 
     // FFT input/output buffers
-    std::vector<std::complex<kiss_fft_scalar>> fwd_fft_in_buffer(N);
-    std::vector<std::complex<kiss_fft_scalar>> fwd_fft_out_buffer(N);
+    std::vector<std::complex<kiss_fft_scalar>> fft_input_buffer(N);
+    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(N);
 
     // IFFT input/output buffers
-    std::vector<std::complex<kiss_fft_scalar>> bwd_fft_in_buffer(M);
-    std::vector<std::complex<kiss_fft_scalar>> bwd_fft_out_buffer(M);
+    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M);
+    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(M);
 
     // Create FFT input buffer
     for (int i=0; i < N; ++i) {
-        fwd_fft_in_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i]);
+        fft_input_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i]);
     }
 
     std::ofstream ofs("fft_input_buffer.asc");
-    for (int i=0; i < N; ++i) {
-        ofs << i << " " << fwd_fft_in_buffer[i].real() << " " << fwd_fft_in_buffer[i].imag() << "\n";
-    }
+    std::copy(fft_input_buffer.begin(), fft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ofs, "\n"));
 
     // Forward N points FFT
-    kiss_fft(fwd_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(fwd_fft_in_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(fwd_fft_out_buffer.data()));
+    kiss_fft(fwd_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(fft_input_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
 
     reopen(ofs, "fft_output_buffer.asc");
-    for (int i=0; i < N; ++i) {
-        ofs << i << " " << fwd_fft_out_buffer[i].real() << " " << fwd_fft_out_buffer[i].imag() << "\n";
-    }
+    std::copy(fft_output_buffer.begin(), fft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ofs, "\n"));
 
     // Create IFFT input buffer
     for (int i=0; i < N/2; ++i) {
-        bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i];
+        ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i];
     }
     for (int i=N/2; i < M - N/2; ++i) {
-        bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * std::complex<kiss_fft_scalar>(0.0, 0.0);
+        ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * std::complex<kiss_fft_scalar>(0.0, 0.0);
     }
     for (int i=M - N/2; i < M; ++i) {
-        bwd_fft_in_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fwd_fft_out_buffer[i - N];
+        ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i - N];
     }
 
     reopen(ofs, "ifft_input_buffer.asc");
-    for (int i=0; i < M; ++i) {
-        ofs << i << " " << bwd_fft_in_buffer[i].real() << " " << bwd_fft_in_buffer[i].imag() << "\n";
-    }
+    std::copy(ifft_input_buffer.begin(), ifft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ofs, "\n"));
 
     // Backward M points IFFT
-    kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(bwd_fft_in_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(bwd_fft_out_buffer.data()));
-    std::transform(bwd_fft_out_buffer.begin(), bwd_fft_out_buffer.end(),
-                   bwd_fft_out_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0/M ));
+    kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer.data()));
+    std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
+                   ifft_output_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0/M ));
 
     reopen(ofs, "ifft_output_buffer.asc");
-    for(int i=0; i < M; ++i) {
-        ofs << i << " " << bwd_fft_out_buffer[i].real() << " " << bwd_fft_out_buffer[i].imag() << "\n";
-    }
+    std::copy(ifft_output_buffer.begin(), ifft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ofs, "\n"));
 
     kiss_fft_cleanup();
     return 0;
