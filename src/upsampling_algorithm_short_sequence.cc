@@ -77,12 +77,10 @@ int main(int argc, char *argv[])
     std::copy(fft_output_buffer.begin(), fft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(fft_output_buffer_file, "\n"));
 
     // Create IFFT input buffer
-    for (int i=0; i < N/2; ++i) {
-        ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i];
-    }
-    for (int i=M - N/2; i < M; ++i) {
-        ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i - N];
-    }
+    std::copy(fft_output_buffer.begin(),       fft_output_buffer.begin() + N/2, ifft_input_buffer.begin());
+    std::copy(fft_output_buffer.begin() + N/2, fft_output_buffer.end(),         ifft_input_buffer.end() - N/2);
+    std::transform(ifft_input_buffer.begin(), ifft_input_buffer.end(),
+                   ifft_input_buffer.begin(), std::bind1st(std::multiplies<std::complex<float>>(),  1.0*I/D ));
 
     std::ofstream ifft_input_buffer_file("ifft_input_buffer.asc");
     std::copy(ifft_input_buffer.begin(), ifft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_input_buffer_file, "\n"));
