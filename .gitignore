@@ -6,3 +6,4 @@
 octave-workspace
 KissFFT/examples/bin
 bin/
+!TestSignals/InfiniteWave/*.wav
