@@ -24,15 +24,19 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    const std::string infilename = argv[argc-1];
-    const std::string resfilename = "res.wav";
-    SndfileHandle  infile(infilename);
-    SndfileHandle resfile(resfilename, SFM_WRITE, infile.format(), infile.channels(), infile.samplerate() * I/D);
+    const std::string input_filename = argv[argc-1];
+    SndfileHandle input_file(input_filename);
+    if (input_file.channels() != 1) {
+        std::cerr << "Only files with one audio channel are supported.\n";
+    }
+
+    const std::string output_filename = "out.wav";
+    SndfileHandle output_file(output_filename, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
 
     // Input data
     std::vector<kiss_fft_scalar> buffer(N);
-    if (infile.read(buffer.data(), N) != N) {
-        std::cerr << "Error reading " << N << " samples from " << infilename << ".\n";
+    if (input_file.read(buffer.data(), N) != N) {
+        std::cerr << "Error reading " << N << " samples from " << input_filename << ".\n";
     }
 
     // Kiss FFT configurations
