@@ -36,7 +36,7 @@ upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o ../Kiss
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 clean:
-	rm -rf *.o $(BINDIR)/*
+	rm -rf *.o *.asc $(BINDIR)/*
 
 %.o: %.c
 	@echo "CC $<"
