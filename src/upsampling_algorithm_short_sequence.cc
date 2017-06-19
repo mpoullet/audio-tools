@@ -30,9 +30,6 @@ int main(int argc, char *argv[])
         std::cerr << "Only files with one audio channel are supported.\n";
     }
 
-    const std::string output_filename = "out.wav";
-    SndfileHandle output_file(output_filename, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
-
     // Input data
     std::vector<kiss_fft_scalar> input_buffer(N);
     if (input_file.read(input_buffer.data(), N) != N) {
@@ -54,15 +51,8 @@ int main(int argc, char *argv[])
         std::cerr << "Error allocating Kiss FFT configurations.\n";
     }
 
-    // FFT input/output buffers
-    std::vector<std::complex<kiss_fft_scalar>> fft_input_buffer(N);
-    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(fft_input_buffer.size());
-
-    // IFFT input/output buffers
-    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M);
-    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(ifft_input_buffer.size());
-
     // Create FFT input buffer
+    std::vector<std::complex<kiss_fft_scalar>> fft_input_buffer(N);
     std::transform(input_buffer.begin(), input_buffer.end(),
                    fft_input_buffer.begin(),
                    [](kiss_fft_scalar real) { return std::complex<kiss_fft_scalar>(real); });
@@ -71,12 +61,14 @@ int main(int argc, char *argv[])
     std::copy(fft_input_buffer.begin(), fft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(fft_input_buffer_file, "\n"));
 
     // Forward N points FFT
+    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(fft_input_buffer.size());
     kiss_fft(fwd_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(fft_input_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
 
     std::ofstream fft_output_buffer_file("fft_output_buffer.asc");
     std::copy(fft_output_buffer.begin(), fft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(fft_output_buffer_file, "\n"));
 
     // Create IFFT input buffer
+    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M);
     std::copy(fft_output_buffer.begin(),       fft_output_buffer.begin() + N/2, ifft_input_buffer.begin());
     std::copy(fft_output_buffer.begin() + N/2, fft_output_buffer.end(),         ifft_input_buffer.end() - N/2);
     std::transform(ifft_input_buffer.begin(), ifft_input_buffer.end(),
@@ -87,6 +79,7 @@ int main(int argc, char *argv[])
     std::copy(ifft_input_buffer.begin(), ifft_input_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_input_buffer_file, "\n"));
 
     // Backward M points IFFT
+    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(ifft_input_buffer.size());
     kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer.data()), reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer.data()));
     std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
                    ifft_output_buffer.begin(),
@@ -96,6 +89,8 @@ int main(int argc, char *argv[])
     std::copy(ifft_output_buffer.begin(), ifft_output_buffer.end(), std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_output_buffer_file, "\n"));
 
     // Store upsampled samples
+    const std::string output_filename = "out.wav";
+    SndfileHandle output_file(output_filename, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
     std::vector<kiss_fft_scalar> output_buffer(ifft_output_buffer.size());
     std::transform(ifft_output_buffer.begin(), ifft_output_buffer.end(),
                    output_buffer.begin(),
