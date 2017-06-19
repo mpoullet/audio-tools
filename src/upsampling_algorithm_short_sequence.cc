@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     // Create FFT input buffer
     std::ofstream ofs("fft_input_buffer.asc");
     for (int i=0; i < N; ++i) {
-        fwd_fft_in_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i], 0.0);
+        fwd_fft_in_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i]);
         ofs << i << " " << fwd_fft_in_buffer[i].real() << " " << fwd_fft_in_buffer[i].imag() << "\n";
     }
 
