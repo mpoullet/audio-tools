@@ -1,4 +1,4 @@
-[FAQ](http://src.infinitewave.ca/faq.html)
+# [FAQ](http://src.infinitewave.ca/faq.html)
 
 ## How can I contribute to the test?
 
