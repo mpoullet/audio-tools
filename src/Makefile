@@ -6,8 +6,8 @@ create_bin_dir := $(shell mkdir -p ../bin)
 BINDIR := ../bin
 KISSFFT_DIR := ../KissFFT/kiss_fft130
 
-CC ?= gcc
-CXX ?= g++
+CC = gcc
+CXX = g++
 CPPFLAGS := -I ./include -I $(KISSFFT_DIR)/tools -I $(KISSFFT_DIR) -Wall -Wextra -Werror -pedantic
 CFLAGS := -std=c11
 CXXFLAGS := -std=c++14
