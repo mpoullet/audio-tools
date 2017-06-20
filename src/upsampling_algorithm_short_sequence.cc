@@ -19,6 +19,13 @@ int main(int argc, char *argv[])
     const int N = 256;
     const int M = I/D*N;
 
+    const auto precision = []() -> std::streamsize {
+        // https://www.working-software.com/cpp-floats-as-decimal
+        if (std::is_same<kiss_fft_scalar, float>::value) return 9;
+        if (std::is_same<kiss_fft_scalar, double>::value) return 17;
+        return std::cout.precision();
+    }();
+
     if (argc != 2) {
         std::cerr << "Usage upsampling_algorithm_short_sequence <filename>\n";
         return -1;
@@ -58,6 +65,7 @@ int main(int argc, char *argv[])
                    [](kiss_fft_scalar real) { return std::complex<kiss_fft_scalar>(real); });
 
     std::ofstream fft_input_buffer_file("fft_input_buffer.asc");
+    fft_input_buffer_file.precision(precision);
     std::copy(std::begin(fft_input_buffer), std::end(fft_input_buffer),
               std::ostream_iterator<std::complex<kiss_fft_scalar>>(fft_input_buffer_file, "\n"));
 
@@ -68,6 +76,7 @@ int main(int argc, char *argv[])
              reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
 
     std::ofstream fft_output_buffer_file("fft_output_buffer.asc");
+    fft_output_buffer_file.precision(precision);
     std::copy(std::begin(fft_output_buffer), std::end(fft_output_buffer),
               std::ostream_iterator<std::complex<kiss_fft_scalar>>(fft_output_buffer_file, "\n"));
 
@@ -82,6 +91,7 @@ int main(int argc, char *argv[])
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0*I/D));
 
     std::ofstream ifft_input_buffer_zeros_file("ifft_input_buffer_zeros.asc");
+    ifft_input_buffer_zeros_file.precision(precision);
     std::copy(std::begin(ifft_input_buffer_zeros), std::end(ifft_input_buffer_zeros),
               std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_input_buffer_zeros_file, "\n"));
 
@@ -95,6 +105,7 @@ int main(int argc, char *argv[])
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
 
     std::ofstream ifft_output_buffer_zeros_file("ifft_output_buffer_zeros.asc");
+    ifft_output_buffer_zeros_file.precision(precision);
     std::copy(std::begin(ifft_output_buffer_zeros), std::end(ifft_output_buffer_zeros),
               std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_output_buffer_zeros_file, "\n"));
 
@@ -118,6 +129,7 @@ int main(int argc, char *argv[])
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0*I/D));
 
     std::ofstream ifft_input_buffer_nonzeros_file("ifft_input_buffer_nonzeros.asc");
+    ifft_input_buffer_nonzeros_file.precision(precision);
     std::copy(std::begin(ifft_input_buffer_nonzeros), std::end(ifft_input_buffer_nonzeros),
               std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_input_buffer_nonzeros_file, "\n"));
 
@@ -129,6 +141,7 @@ int main(int argc, char *argv[])
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
 
     std::ofstream ifft_output_buffer_nonzeros_file("ifft_output_buffer_nonzeros.asc");
+    ifft_output_buffer_nonzeros_file.precision(precision);
     std::copy(std::begin(ifft_output_buffer_nonzeros), std::end(ifft_output_buffer_nonzeros),
               std::ostream_iterator<std::complex<kiss_fft_scalar>>(ifft_output_buffer_nonzeros_file, "\n"));
 
