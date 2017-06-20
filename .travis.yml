@@ -1,0 +1,20 @@
+language:
+- cpp
+dist:
+- trusty
+compiler:
+- gcc
+- clang
+before_install:
+- sudo apt-get -qq update
+install:
+- sudo apt-get install -y autoconf-archive
+- sudo apt-get install -y libboost-all-dev
+- sudo apt-get install -y libsndfile1-dev
+script:
+- make -C KissFFT/examples clean all V=1 CC=gcc   CXX=g++
+- make -C KissFFT/examples clean all V=1 CC=clang CXX=clang++
+- make -C src clean all V=1 CC=gcc   CXX=g++
+- make -C src clean all V=1 CC=clang CXX=clang++
+after_success:
+- bin/upsampling_algorithm_short_sequence octave/sine_48000_pcm32_short.wav
