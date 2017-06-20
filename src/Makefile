@@ -4,10 +4,11 @@
 create_bin_dir := $(shell mkdir -p ../bin)
 
 BINDIR := ../bin
+KISSFFT_DIR := ../KissFFT/kiss_fft130
 
 CC ?= gcc
 CXX ?= g++
-CPPFLAGS := -I ./ -I ../KissFFT/kiss_fft130/tools/ -I ../KissFFT/kiss_fft130/ -Wall -Wextra -Werror -pedantic
+CPPFLAGS := -I ./include -I $(KISSFFT_DIR)/tools -I $(KISSFFT_DIR) -Wall -Wextra -Werror -pedantic
 CFLAGS := -std=c11
 CXXFLAGS := -std=c++14
 LIBS := -lm -lsndfile -lboost_program_options -lboost_system -lboost_filesystem
@@ -27,11 +28,11 @@ command_line: command_line.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
-upsampling_algorithm_short_sequence: upsampling_algorithm_short_sequence.o ../KissFFT/kiss_fft130/kiss_fft.o ../KissFFT/kiss_fft130/tools/kiss_fftr.o
+upsampling_algorithm_short_sequence: upsampling_algorithm_short_sequence.o $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
-upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o ../KissFFT/kiss_fft130/kiss_fft.o ../KissFFT/kiss_fft130/tools/kiss_fftr.o
+upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
