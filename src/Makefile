@@ -6,8 +6,6 @@ create_bin_dir := $(shell mkdir -p ../bin)
 BINDIR := ../bin
 KISSFFT_DIR := ../KissFFT/kiss_fft130
 
-CC = gcc
-CXX = g++
 CPPFLAGS := -I ./include -I $(KISSFFT_DIR)/tools -I $(KISSFFT_DIR) -Wall -Wextra -Werror -pedantic
 CFLAGS := -std=c11
 CXXFLAGS := -std=c++14
@@ -37,7 +35,7 @@ upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o $(KISSF
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 clean:
-	rm -rf *.o *.asc $(BINDIR)/*
+	rm -rf *.o *.asc $(BINDIR)/* $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
 
 %.o: %.c
 	@echo "CC $<"
