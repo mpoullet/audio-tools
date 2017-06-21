@@ -117,12 +117,12 @@ int main(int argc, char *argv[])
     // Method 2
 
     // Create IFFT input buffer, C_i = X(N/2)
-    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer_nonzeros(M, std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]));
+    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer_nonzeros(M, static_cast<kiss_fft_scalar>(1.0*D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]));
     std::copy(std::begin(fft_output_buffer),       std::begin(fft_output_buffer) + N/2, std::begin(ifft_input_buffer_nonzeros));
     std::copy(std::begin(fft_output_buffer) + N/2, std::end(fft_output_buffer),         std::end(ifft_input_buffer_nonzeros) - N/2);
     std::transform(std::begin(ifft_input_buffer_nonzeros), std::end(ifft_input_buffer_nonzeros),
                    std::begin(ifft_input_buffer_nonzeros),
-                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0*I/D));
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), static_cast<kiss_fft_scalar>(1.0*I/D)));
 
     write_complex_data(ifft_input_buffer_nonzeros, "ifft_input_buffer_nonzeros.asc");
 
