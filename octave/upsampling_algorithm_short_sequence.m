@@ -21,16 +21,7 @@ N = 256;
 
 % WAV file input
 [data, fs, nbits] = wavread('sine_48000_pcm32_short.wav');
-sample_counts = length(data);
-
-% Plot sound file in time domain
-t_all = (1/fs)*(1:sample_counts);
-title_name = 'Time domain (all samples) 48kHz';
-figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_all, data);
-xlabel('Time (s)');
-ylabel('Amplitude');
-title(title_name);
+plot_wav_file('sine_48000_pcm32_short.wav', 'Time domain (all samples) 48kHz');
 
 %
 % Short sequence without overlap

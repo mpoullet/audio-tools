@@ -1,3 +1,4 @@
+% Compare Octave and C++ values
 fft_input_buffer = read_complex_file('../src/fft_input_buffer.asc');
 cmp_fft_input = [fft_input_data, fft_input_buffer];
 
@@ -17,31 +18,5 @@ ifft_output_buffer_nonzeros = read_complex_file('../src/ifft_output_buffer_nonze
 cmp_ifft_output_nonzeros = [real(ifft_output_data_nonzeros), real(ifft_output_buffer_nonzeros)];
 
 % Plot C++ generated sinewaves
-
-% WAV file input
-[data, fs, nbits] = wavread('../src/upsampling_algorithm_short_sequence_out_zeros.wav');
-sample_counts = length(data);
-
-% Plot sound file in time domain
-t_all = (1/fs)*(1:sample_counts);
-title_name = 'C++: Time domain (first block resampled) 96kHz | C_i = 0';
-figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_all, data);
-xlabel('Time (s)');
-ylabel('Amplitude');
-ylim([-1 1]);
-title(title_name);
-
-% WAV file input
-[data, fs, nbits] = wavread('../src/upsampling_algorithm_short_sequence_out_nonzeros.wav');
-sample_counts = length(data);
-
-% Plot sound file in time domain
-t_all = (1/fs)*(1:sample_counts);
-title_name = 'C++: Time domain (first block resampled) 96kHz | C_i = X(N/2)';
-figure('Name', title_name, 'NumberTitle', 'off');
-plot(t_all, data);
-xlabel('Time (s)');
-ylabel('Amplitude');
-ylim([-1 1]);
-title(title_name);
+plot_wav_file('../src/upsampling_algorithm_short_sequence_out_zeros.wav', 'C++: Time domain (first block resampled) 96kHz | C_i = 0');
+plot_wav_file('../src/upsampling_algorithm_short_sequence_out_nonzeros.wav', 'C++: Time domain (first block resampled) 96kHz | C_i = X(N/2)');
