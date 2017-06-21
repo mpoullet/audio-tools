@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     write_complex_data(ifft_output_buffer_zeros, "ifft_output_buffer_zeros.asc");
 
     // Store results
-    const std::string output_filename_zeros = "out_zeros.wav";
+    const std::string output_filename_zeros = "upsampling_algorithm_short_sequence_out_zeros.wav";
     SndfileHandle output_file_zeros(output_filename_zeros, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
     std::vector<kiss_fft_scalar> output_buffer_zeros(ifft_output_buffer_zeros.size());
     std::transform(std::begin(ifft_output_buffer_zeros), std::end(ifft_output_buffer_zeros),
@@ -128,7 +128,9 @@ int main(int argc, char *argv[])
 
     // Backward M points IFFT
     std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer_nonzeros(ifft_input_buffer_nonzeros.size());
-    kiss_fft(inv_cfg.get(), reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer_nonzeros.data()), reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer_nonzeros.data()));
+    kiss_fft(inv_cfg.get(),
+             reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer_nonzeros.data()),
+             reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer_nonzeros.data()));
     std::transform(std::begin(ifft_output_buffer_nonzeros), std::end(ifft_output_buffer_nonzeros),
                    std::begin(ifft_output_buffer_nonzeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
@@ -136,7 +138,7 @@ int main(int argc, char *argv[])
     write_complex_data(ifft_output_buffer_nonzeros, "ifft_output_buffer_nonzeros.asc");
 
     // Store results
-    const std::string output_filename_nonzeros = "out_nonzeros.wav";
+    const std::string output_filename_nonzeros = "upsampling_algorithm_short_sequence_out_nonzeros.wav";
     SndfileHandle output_file_nonzeros(output_filename_nonzeros, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
     std::vector<kiss_fft_scalar> output_buffer_nonzeros(ifft_output_buffer_nonzeros.size());
     std::transform(std::begin(ifft_output_buffer_nonzeros), std::end(ifft_output_buffer_nonzeros),
