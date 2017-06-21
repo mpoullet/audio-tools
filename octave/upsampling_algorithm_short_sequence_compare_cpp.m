@@ -19,7 +19,7 @@ cmp_ifft_output_nonzeros = [real(ifft_output_data_nonzeros), real(ifft_output_bu
 % Plot C++ generated sinewaves
 
 % WAV file input
-[data, fs, nbits] = wavread('../src/out_zeros.wav');
+[data, fs, nbits] = wavread('../src/upsampling_algorithm_short_sequence_out_zeros.wav');
 sample_counts = length(data);
 
 % Plot sound file in time domain
@@ -33,7 +33,7 @@ ylim([-1 1]);
 title(title_name);
 
 % WAV file input
-[data, fs, nbits] = wavread('../src/out_nonzeros.wav');
+[data, fs, nbits] = wavread('../src/upsampling_algorithm_short_sequence_out_nonzeros.wav');
 sample_counts = length(data);
 
 % Plot sound file in time domain
