@@ -76,11 +76,11 @@ int main(int argc, char *argv[])
 
     // FFT input/output buffers
     std::vector<std::complex<kiss_fft_scalar>> fft_input_buffer(N);
-    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(N);
+    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(fft_input_buffer.size());
 
     // IFFT input/output buffers
     std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M);
-    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(M);
+    std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer(ifft_input_buffer.size());
 
     /* prepend 2L zeros */
     for (int i=0; i < 2*L; ++i) {
