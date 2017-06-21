@@ -97,24 +97,24 @@ int main(int argc, char *argv[])
         for(int i=0; i < std::min(static_cast<int>(readcount) + 2*L, N); ++i) {
             fft_input_buffer[i] = std::complex<kiss_fft_scalar>(buffer[i]);
         }
+
         write_complex_data(fft_input_buffer, "fft_input_buffer_" + std::to_string(cnt) + ".asc");
 
         /* Forward N points FFT */
         kiss_fft(fwd_cfg.get(),
                 reinterpret_cast<kiss_fft_cpx*>(fft_input_buffer.data()),
                 reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
+
         write_complex_data(fft_output_buffer, "fft_output_buffer_" + std::to_string(cnt) + ".asc");
 
         /* Create IFFT input buffer */
-        for(int i=0; i < N/2; ++i) {
-            ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i];
-        }
-        for(int i=N/2; i <= M - N/2; ++i) {
-            ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[N/2];
-        }
-        for(int i=M - N/2 + 1; i < M; ++i) {
-            ifft_input_buffer[i] = static_cast<kiss_fft_scalar>(I/D) * fft_output_buffer[i + M/2];
-        }
+        std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M, static_cast<kiss_fft_scalar>(1.0*D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]));
+        std::copy(std::begin(fft_output_buffer),       std::begin(fft_output_buffer) + N/2, std::begin(ifft_input_buffer));
+        std::copy(std::begin(fft_output_buffer) + N/2, std::end(fft_output_buffer),         std::end(ifft_input_buffer) - N/2);
+        std::transform(std::begin(ifft_input_buffer), std::end(ifft_input_buffer),
+                       std::begin(ifft_input_buffer),
+                       std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), static_cast<float>(1.0*I/D)));
+
         write_complex_data(ifft_input_buffer, "ifft_input_buffer_" + std::to_string(cnt) + ".asc");
 
         /* Backward M points IFFT */
@@ -124,7 +124,6 @@ int main(int argc, char *argv[])
         std::transform(std::begin(ifft_output_buffer), std::end(ifft_output_buffer),
                        std::begin(ifft_output_buffer),
                        std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
-
         write_complex_data(ifft_output_buffer, "ifft_output_buffer_" + std::to_string(cnt) + ".asc");
 
         /* Discard first and last I/D*L points and store the rest of the real vector */
