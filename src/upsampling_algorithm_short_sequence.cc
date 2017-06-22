@@ -43,12 +43,14 @@ int main(int argc, char *argv[])
     SndfileHandle input_file(input_filename);
     if (input_file.channels() != 1) {
         std::cerr << "Only files with one audio channel are supported.\n";
+        return -1;
     }
 
     // Input data
     std::vector<kiss_fft_scalar> input_buffer(N);
     if (input_file.read(input_buffer.data(), N) != N) {
         std::cerr << "Error reading " << N << " samples from " << input_filename << ".\n";
+        return -1;
     }
 
     // Kiss FFT configurations
@@ -64,6 +66,7 @@ int main(int argc, char *argv[])
 
     if (fwd_cfg == nullptr || inv_cfg == nullptr) {
         std::cerr << "Error allocating Kiss FFT configurations.\n";
+        return -1;
     }
 
     // Create FFT input buffer
