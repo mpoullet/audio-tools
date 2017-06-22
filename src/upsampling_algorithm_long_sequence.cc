@@ -50,12 +50,12 @@ int main(int argc, char *argv[])
     }
 
     // Kiss FFT configurations
-    auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, nullptr, nullptr),
         kiss_fft_free
     };
 
-    auto inv_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto inv_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(M, 1, nullptr, nullptr),
         kiss_fft_free
     };
@@ -69,11 +69,8 @@ int main(int argc, char *argv[])
     SndfileHandle debug_input_file(input_file);
 
     const std::string output_filename = "upsampling_algorithm_long_sequence_out.wav";
-    SndfileHandle output_file(output_filename,
-                              SFM_WRITE,
-                              input_file.format(),
-                              input_file.channels(),
-                              input_file.samplerate() * I/D);
+    SndfileHandle output_file(output_filename, SFM_WRITE,
+                              input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
 
     // Input data
     std::vector<kiss_fft_scalar> buffer(N);
@@ -109,9 +106,12 @@ int main(int argc, char *argv[])
         write_complex_data(fft_output_buffer, "fft_output_buffer_" + std::to_string(cnt) + ".asc");
 
         // Create IFFT input buffer
-        std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M, static_cast<kiss_fft_scalar>(1.0*D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]));
-        std::copy(std::begin(fft_output_buffer),           std::begin(fft_output_buffer) + N/2, std::begin(ifft_input_buffer));
-        std::copy(std::begin(fft_output_buffer) + N/2 + 1, std::end(fft_output_buffer),         std::end(ifft_input_buffer) - N/2 + 1);
+        const auto C_i = static_cast<kiss_fft_scalar>(1.0 * D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]);
+        std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M, C_i);
+        std::copy(std::begin(fft_output_buffer), std::begin(fft_output_buffer) + N/2,
+                  std::begin(ifft_input_buffer));
+        std::copy(std::begin(fft_output_buffer) + N/2 + 1, std::end(fft_output_buffer),
+                  std::end(ifft_input_buffer) - N/2 + 1);
         std::transform(std::begin(ifft_input_buffer), std::end(ifft_input_buffer),
                        std::begin(ifft_input_buffer),
                        std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), static_cast<float>(1.0*I/D)));
