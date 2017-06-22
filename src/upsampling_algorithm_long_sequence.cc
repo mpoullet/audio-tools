@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
                   std::end(ifft_input_buffer) - N/2 + 1);
         std::transform(std::begin(ifft_input_buffer), std::end(ifft_input_buffer),
                        std::begin(ifft_input_buffer),
-                       std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), static_cast<float>(1.0*I/D)));
+                       std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 * I/D));
 
         write_complex_data(ifft_input_buffer, "ifft_input_buffer_" + std::to_string(cnt) + ".asc");
 
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
                  reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer.data()));
         std::transform(std::begin(ifft_output_buffer), std::end(ifft_output_buffer),
                        std::begin(ifft_output_buffer),
-                       std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
+                       std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 / M));
 
         write_complex_data(ifft_output_buffer, "ifft_output_buffer_" + std::to_string(cnt) + ".asc");
 

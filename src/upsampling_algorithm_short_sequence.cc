@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
               std::end(ifft_input_buffer_zeros) - N/2 + 1);
     std::transform(std::begin(ifft_input_buffer_zeros), std::end(ifft_input_buffer_zeros),
                    std::begin(ifft_input_buffer_zeros),
-                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0*I/D));
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 * I/D));
 
     write_complex_data(ifft_input_buffer_zeros, "ifft_input_buffer_zeros.asc");
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
              reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer_zeros.data()));
     std::transform(std::begin(ifft_output_buffer_zeros), std::end(ifft_output_buffer_zeros),
                    std::begin(ifft_output_buffer_zeros),
-                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 / M));
 
     write_complex_data(ifft_output_buffer_zeros, "ifft_output_buffer_zeros.asc");
 
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
               std::end(ifft_input_buffer_nonzeros) - N/2 + 1);
     std::transform(std::begin(ifft_input_buffer_nonzeros), std::end(ifft_input_buffer_nonzeros),
                    std::begin(ifft_input_buffer_nonzeros),
-                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), static_cast<kiss_fft_scalar>(1.0*I/D)));
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 * I/D));
 
     write_complex_data(ifft_input_buffer_nonzeros, "ifft_input_buffer_nonzeros.asc");
 
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
              reinterpret_cast<kiss_fft_cpx*>(ifft_output_buffer_nonzeros.data()));
     std::transform(std::begin(ifft_output_buffer_nonzeros), std::end(ifft_output_buffer_nonzeros),
                    std::begin(ifft_output_buffer_nonzeros),
-                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0/M));
+                   std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 / M));
 
     write_complex_data(ifft_output_buffer_nonzeros, "ifft_output_buffer_nonzeros.asc");
 
