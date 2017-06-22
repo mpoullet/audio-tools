@@ -56,12 +56,12 @@ int main(int argc, char *argv[])
     }
 
     // Kiss FFT configurations
-    auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, nullptr, nullptr),
         kiss_fft_free
     };
 
-    auto inv_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto inv_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(M, 1, nullptr, nullptr),
         kiss_fft_free
     };
@@ -91,8 +91,10 @@ int main(int argc, char *argv[])
 
     // Create IFFT input buffer, C_i = 0
     std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer_zeros(M);
-    std::copy(std::begin(fft_output_buffer),           std::begin(fft_output_buffer) + N/2, std::begin(ifft_input_buffer_zeros));
-    std::copy(std::begin(fft_output_buffer) + N/2 + 1, std::end(fft_output_buffer),         std::end(ifft_input_buffer_zeros) - N/2 + 1);
+    std::copy(std::begin(fft_output_buffer), std::begin(fft_output_buffer) + N/2,
+              std::begin(ifft_input_buffer_zeros));
+    std::copy(std::begin(fft_output_buffer) + N/2 + 1, std::end(fft_output_buffer),
+              std::end(ifft_input_buffer_zeros) - N/2 + 1);
     std::transform(std::begin(ifft_input_buffer_zeros), std::end(ifft_input_buffer_zeros),
                    std::begin(ifft_input_buffer_zeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0*I/D));
@@ -125,15 +127,19 @@ int main(int argc, char *argv[])
               std::ostream_iterator<kiss_fft_scalar>(debug_output_file_zeros, "\n"));
 
     const std::string output_filename_zeros = "upsampling_algorithm_short_sequence_out_zeros.wav";
-    SndfileHandle output_file_zeros(output_filename_zeros, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
+    SndfileHandle output_file_zeros(output_filename_zeros, SFM_WRITE,
+                                    input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
     output_file_zeros.write(output_buffer_zeros.data(), output_buffer_zeros.size());
 
     // Method 2
 
     // Create IFFT input buffer, C_i = X(N/2)
-    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer_nonzeros(M, static_cast<kiss_fft_scalar>(1.0*D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]));
-    std::copy(std::begin(fft_output_buffer),           std::begin(fft_output_buffer) + N/2, std::begin(ifft_input_buffer_nonzeros));
-    std::copy(std::begin(fft_output_buffer) + N/2 + 1, std::end(fft_output_buffer),         std::end(ifft_input_buffer_nonzeros) - N/2 + 1);
+    const auto C_i = static_cast<kiss_fft_scalar>(1.0 * D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]);
+    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer_nonzeros(M, C_i);
+    std::copy(std::begin(fft_output_buffer), std::begin(fft_output_buffer) + N/2,
+              std::begin(ifft_input_buffer_nonzeros));
+    std::copy(std::begin(fft_output_buffer) + N/2 + 1, std::end(fft_output_buffer),
+              std::end(ifft_input_buffer_nonzeros) - N/2 + 1);
     std::transform(std::begin(ifft_input_buffer_nonzeros), std::end(ifft_input_buffer_nonzeros),
                    std::begin(ifft_input_buffer_nonzeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), static_cast<kiss_fft_scalar>(1.0*I/D)));
@@ -166,7 +172,8 @@ int main(int argc, char *argv[])
               std::ostream_iterator<kiss_fft_scalar>(debug_output_file_nonzeros, "\n"));
 
     const std::string output_filename_nonzeros = "upsampling_algorithm_short_sequence_out_nonzeros.wav";
-    SndfileHandle output_file_nonzeros(output_filename_nonzeros, SFM_WRITE, input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
+    SndfileHandle output_file_nonzeros(output_filename_nonzeros, SFM_WRITE,
+                                       input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
     output_file_nonzeros.write(output_buffer_nonzeros.data(), output_buffer_nonzeros.size());
 
     kiss_fft_cleanup();
