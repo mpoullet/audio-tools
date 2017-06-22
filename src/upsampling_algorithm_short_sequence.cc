@@ -12,19 +12,21 @@
 #define kiss_fft_scalar float
 #include "kiss_fft.h"
 
-static const auto precision = []() -> std::streamsize {
-        // https://www.working-software.com/cpp-floats-as-decimal
-        if (std::is_same<kiss_fft_scalar, float>::value) return 9;
-        if (std::is_same<kiss_fft_scalar, double>::value) return 17;
-        return std::cout.precision();
-    }();
+namespace {
+    const auto precision = []() -> std::streamsize {
+            // https://www.working-software.com/cpp-floats-as-decimal
+            if (std::is_same<kiss_fft_scalar, float>::value) return 9;
+            if (std::is_same<kiss_fft_scalar, double>::value) return 17;
+            return std::cout.precision();
+        }();
 
-static void write_complex_data(const std::vector<std::complex<kiss_fft_scalar>>& v, const std::string& filename)
-{
-    std::ofstream file(filename);
-    file.precision(precision);
-    std::copy(std::begin(v), std::end(v),
-              std::ostream_iterator<std::complex<kiss_fft_scalar>>(file, "\n"));
+    void write_complex_data(const std::vector<std::complex<kiss_fft_scalar>>& v, const std::string& filename)
+    {
+        std::ofstream file(filename);
+        file.precision(precision);
+        std::copy(std::begin(v), std::end(v),
+                  std::ostream_iterator<std::complex<kiss_fft_scalar>>(file, "\n"));
+    }
 }
 
 int main(int argc, char *argv[])
