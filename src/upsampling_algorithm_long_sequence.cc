@@ -40,6 +40,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    const std::string input_filename = argv[argc-1];
+    SndfileHandle input_file(input_filename);
+    if (input_file.channels() != 1) {
+        std::cerr << "Only files with one audio channel are supported.\n";
+        return -1;
+    }
+
     // Kiss FFT configurations
     auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, nullptr, nullptr),
@@ -53,12 +60,7 @@ int main(int argc, char *argv[])
 
     if (fwd_cfg == nullptr || inv_cfg == nullptr) {
         std::cerr << "Error allocating Kiss FFT configurations.\n";
-    }
-
-    const std::string input_filename = argv[argc-1];
-    SndfileHandle input_file(input_filename);
-    if (input_file.channels() != 1) {
-        std::cerr << "Only files with one audio channel are supported.\n";
+        return -1;
     }
 
     const std::string debug_input_filename = "upsampling_algorithm_long_sequence_debug_input.wav";
