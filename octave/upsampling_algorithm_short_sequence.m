@@ -72,7 +72,7 @@ title(title_name);
 % Method 2
 
 % C_i = X(N/2)
-filling = ones(N1-N + 1,1)*fft_output_data(N/2);
+filling = ones(N1-N + 1,1)*fft_output_data(N/2 + 1);
 ifft_input_data_nonzeros=[I/D*fft_output_data(1:N/2);filling;I/D*fft_output_data(N/2 + 2:N)];
 ifft_output_data_nonzeros=ifft(ifft_input_data_nonzeros);
 

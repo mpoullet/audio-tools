@@ -25,3 +25,6 @@ for i=1:10
     filename = [filename_prefix num2str(i-1) '.asc'];
     ifft_output_buffer(:,i) = read_complex_file(filename);
 endfor
+
+% Plot C++ generated sinewave
+plot_wav_file('../src/upsampling_algorithm_long_sequence_out.wav' , 'C++: Time domain 96kHz | C_i = X(N/2)');

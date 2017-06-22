@@ -53,8 +53,8 @@ fft_output = fft(fft_input);
 % Method 1
 
 % C_i = 0
-filling_zeros = zeros(N1-N, size(fft_input, 2));
-ifft_input = [I/D*fft_output(1:N/2,:);filling_zeros;I/D*fft_output(N/2+1:N,:)];
+filling_zeros = zeros(N1-N + 1, size(fft_input, 2));
+ifft_input = [I/D*fft_output(1:N/2,:); filling_zeros; I/D*fft_output(N/2 + 2:N,:)];
 % N1 points IFFT
 ifft_output=real(ifft(ifft_input));
 % Remove both L1 points ends
@@ -76,8 +76,8 @@ title(title_name);
 % Method 2
 
 % C_i = X(N/2)
-filling_nonzeros = bsxfun(@times, ones(N1-N, size(fft_input, 2)), fft_output(N/2,:));
-ifft_input = [I/D*fft_output(1:N/2,:);filling_nonzeros;I/D*fft_output(N/2+1:N,:)];
+filling_nonzeros = bsxfun(@times, ones(N1-N + 1, size(fft_input, 2)), fft_output(N/2 + 1,:));
+ifft_input = [I/D*fft_output(1:N/2,:); filling_nonzeros; I/D*fft_output(N/2 + 2:N,:)];
 % N1 points IFFT
 ifft_output=real(ifft(ifft_input));
 % Remove both L1 points ends
