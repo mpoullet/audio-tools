@@ -55,7 +55,7 @@ N1 = I/D*N;
 % Method 1
 
 % C_i = 0
-ifft_input_data_zeros=[I/D*fft_output_data(1:N/2);zeros(N1-N,1);I/D*fft_output_data(N/2+1:N)];
+ifft_input_data_zeros=[I/D*fft_output_data(1:N/2);zeros(N1-N + 1,1);I/D*fft_output_data(N/2 + 2:N)];
 ifft_output_data_zeros=ifft(ifft_input_data_zeros);
 
 % Plot N1 points output block in time domain
@@ -72,8 +72,8 @@ title(title_name);
 % Method 2
 
 % C_i = X(N/2)
-filling = ones(N1-N,1)*fft_output_data(N/2);
-ifft_input_data_nonzeros=[I/D*fft_output_data(1:N/2);filling;I/D*fft_output_data(N/2+1:N)];
+filling = ones(N1-N + 1,1)*fft_output_data(N/2);
+ifft_input_data_nonzeros=[I/D*fft_output_data(1:N/2);filling;I/D*fft_output_data(N/2 + 2:N)];
 ifft_output_data_nonzeros=ifft(ifft_input_data_nonzeros);
 
 % Plot N1 points output block in time domain
