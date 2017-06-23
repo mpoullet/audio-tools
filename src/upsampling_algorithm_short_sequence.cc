@@ -20,12 +20,13 @@ namespace {
             return std::cout.precision();
         }();
 
-    void write_complex_data(const std::vector<std::complex<kiss_fft_scalar>>& v, const std::string& filename)
+    template <typename T>
+    void write_data(const std::vector<T>& v, const std::string& filename)
     {
         std::ofstream file(filename);
         file.precision(precision);
         std::copy(std::begin(v), std::end(v),
-                  std::ostream_iterator<std::complex<kiss_fft_scalar>>(file, "\n"));
+                  std::ostream_iterator<T>(file, "\n"));
     }
 }
 
@@ -77,7 +78,7 @@ int main(int argc, char *argv[])
                    std::begin(fft_input_buffer),
                    [](kiss_fft_scalar real) { return std::complex<kiss_fft_scalar>(real); });
 
-    write_complex_data(fft_input_buffer, "fft_input_buffer.asc");
+    write_data(fft_input_buffer, "fft_input_buffer.asc");
 
     // Forward N points FFT
     std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(fft_input_buffer.size());
@@ -85,7 +86,7 @@ int main(int argc, char *argv[])
              reinterpret_cast<kiss_fft_cpx*>(fft_input_buffer.data()),
              reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
 
-    write_complex_data(fft_output_buffer, "fft_output_buffer.asc");
+    write_data(fft_output_buffer, "fft_output_buffer.asc");
 
     // Method 1
 
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
                    std::begin(ifft_input_buffer_zeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 * I/D));
 
-    write_complex_data(ifft_input_buffer_zeros, "ifft_input_buffer_zeros.asc");
+    write_data(ifft_input_buffer_zeros, "ifft_input_buffer_zeros.asc");
 
     // Backward M points IFFT
     std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer_zeros(ifft_input_buffer_zeros.size());
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
                    std::begin(ifft_output_buffer_zeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 / M));
 
-    write_complex_data(ifft_output_buffer_zeros, "ifft_output_buffer_zeros.asc");
+    write_data(ifft_output_buffer_zeros, "ifft_output_buffer_zeros.asc");
 
     // Store results
     std::vector<kiss_fft_scalar> output_buffer_zeros(ifft_output_buffer_zeros.size());
@@ -121,10 +122,7 @@ int main(int argc, char *argv[])
                        return std::max(-max_val, std::min(cpx.real(), max_val));
                    });
 
-    std::ofstream debug_output_file_zeros("upsampling_algorithm_short_sequence_out_zeros.asc");
-    debug_output_file_zeros.precision(precision);
-    std::copy(std::begin(output_buffer_zeros), std::end(output_buffer_zeros),
-              std::ostream_iterator<kiss_fft_scalar>(debug_output_file_zeros, "\n"));
+    write_data(output_buffer_zeros, "upsampling_algorithm_short_sequence_out_zeros.asc");
 
     const std::string output_filename_zeros = "upsampling_algorithm_short_sequence_out_zeros.wav";
     SndfileHandle output_file_zeros(output_filename_zeros, SFM_WRITE,
@@ -144,7 +142,7 @@ int main(int argc, char *argv[])
                    std::begin(ifft_input_buffer_nonzeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 * I/D));
 
-    write_complex_data(ifft_input_buffer_nonzeros, "ifft_input_buffer_nonzeros.asc");
+    write_data(ifft_input_buffer_nonzeros, "ifft_input_buffer_nonzeros.asc");
 
     // Backward M points IFFT
     std::vector<std::complex<kiss_fft_scalar>> ifft_output_buffer_nonzeros(ifft_input_buffer_nonzeros.size());
@@ -155,7 +153,7 @@ int main(int argc, char *argv[])
                    std::begin(ifft_output_buffer_nonzeros),
                    std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 / M));
 
-    write_complex_data(ifft_output_buffer_nonzeros, "ifft_output_buffer_nonzeros.asc");
+    write_data(ifft_output_buffer_nonzeros, "ifft_output_buffer_nonzeros.asc");
 
     // Store results
     std::vector<kiss_fft_scalar> output_buffer_nonzeros(ifft_output_buffer_nonzeros.size());
@@ -166,10 +164,7 @@ int main(int argc, char *argv[])
                        return std::max(-max_val, std::min(cpx.real(), max_val));
                    });
 
-    std::ofstream debug_output_file_nonzeros("upsampling_algorithm_short_sequence_out_nonzeros.asc");
-    debug_output_file_nonzeros.precision(precision);
-    std::copy(std::begin(output_buffer_nonzeros), std::end(output_buffer_nonzeros),
-              std::ostream_iterator<kiss_fft_scalar>(debug_output_file_nonzeros, "\n"));
+    write_data(output_buffer_nonzeros, "upsampling_algorithm_short_sequence_out_nonzeros.asc");
 
     const std::string output_filename_nonzeros = "upsampling_algorithm_short_sequence_out_nonzeros.wav";
     SndfileHandle output_file_nonzeros(output_filename_nonzeros, SFM_WRITE,
