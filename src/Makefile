@@ -11,18 +11,18 @@ CFLAGS := -std=c11
 CXXFLAGS := -std=c++14
 LIBS := -lm -lsndfile -lboost_program_options -lboost_system -lboost_filesystem
 
-all: make_sine command_line upsampling_algorithm_short_sequence upsampling_algorithm_long_sequence
+all: generate_A440 generate_sine_wave upsampling_algorithm_short_sequence upsampling_algorithm_long_sequence
 .PHONY: all clean
 
 # Automatic variables: https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
 # $@ is the file name of the target of the rule.
 # $^ is the names of all the prerequisites, whith spaces between them.
 # $< is the name of the first prerequisite.
-make_sine: make_sine.o
+generate_A440: generate_A440.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
-command_line: command_line.o
+generate_sine_wave: generate_sine_wave.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 

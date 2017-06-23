@@ -27,9 +27,12 @@ find ./KissFFT/examples/ ./src \( -name "*.c" -o -name "*.cc" \) -exec cppcheck 
     -I KissFFT/kiss_fft130/tools/ {} +
 
 if [ "$param1" == "--run" ]; then
-    echo -e "${YELLOW}Running...${NOCOLOR}"
-    #bin/make_sine
-    bin/command_line --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
+    echo -e "${YELLOW}Running generate_A440${NOCOLOR}"
+    bin/generate_A440
+    echo -e "${YELLOW}Running generate_sine_wave${NOCOLOR}"
+    bin/generate_sine_wave --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
+    echo -e "${YELLOW}Running upsampling_algorithm_short_sequence${NOCOLOR}"
     bin/upsampling_algorithm_short_sequence octave/sine_48000_pcm32_short.wav
+    echo -e "${YELLOW}Running upsampling_algorithm_long_sequence${NOCOLOR}"
     bin/upsampling_algorithm_long_sequence  octave/sine_48000_pcm32_long.wav
 fi
