@@ -11,7 +11,12 @@ CFLAGS := -std=c11
 CXXFLAGS := -std=c++14
 LIBS := -lm -lsndfile -lboost_program_options -lboost_system -lboost_filesystem
 
-all: generate_A440 generate_sine_wave upsampling_algorithm_short_sequence upsampling_algorithm_long_sequence
+all: generate_A440 \
+	 generate_sine_wave \
+	 upsampling_algorithm_short_sequence \
+	 upsampling_algorithm_long_sequence \
+	 upsampling_algorithm_long_sequence_real_fft
+
 .PHONY: all clean
 
 # Automatic variables: https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html
@@ -31,6 +36,10 @@ upsampling_algorithm_short_sequence: upsampling_algorithm_short_sequence.o $(KIS
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
+	@echo "LD $@"
+	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+
+upsampling_algorithm_long_sequence_real_fft: upsampling_algorithm_long_sequence_real_fft.o $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
