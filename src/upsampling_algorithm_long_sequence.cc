@@ -87,11 +87,20 @@ int main(int argc, char *argv[])
     int cnt=0;
     while (sf_count_t readcount = input_file.read(buffer.data() + 2*L, N - 2*L))
     {
+        std::cout << cnt << ": " << readcount << " read.\n";
+
         // Store original samples
         debug_input_file.write(buffer.data() + 2*L, std::min(static_cast<int>(readcount), N - 2*L));
 
+        if (readcount < N - 2*L) {
+            std::fill(std::begin(buffer) + 2*L + readcount, std::end(buffer), 0);
+            std::cout << "filled with " << N - (2*L + readcount) << " zeros.\n";
+        }
+
+        write_data(buffer, "buffer_" + std::to_string(cnt) + ".asc");
+
         // Create FFT input buffer: 1 block of N samples with 2*L overlap
-        std::transform(std::begin(buffer), std::begin(buffer) + std::min(static_cast<int>(readcount) + 2*L, N),
+        std::transform(std::begin(buffer), std::end(buffer),
                        std::begin(fft_input_buffer),
                        [](const kiss_fft_scalar& scalar) {
                            return std::complex<kiss_fft_scalar>(scalar);
@@ -101,8 +110,8 @@ int main(int argc, char *argv[])
 
         // Forward N points FFT
         kiss_fft(fwd_cfg.get(),
-                reinterpret_cast<kiss_fft_cpx*>(fft_input_buffer.data()),
-                reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
+                 reinterpret_cast<kiss_fft_cpx*>(fft_input_buffer.data()),
+                 reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
 
         write_data(fft_output_buffer, "fft_output_buffer_" + std::to_string(cnt) + ".asc");
 
