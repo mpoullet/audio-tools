@@ -83,8 +83,15 @@ int main(int argc, char *argv[])
     int cnt=0;
     while (sf_count_t readcount = input_file.read(fft_input_buffer.data() + 2*L, N - 2*L))
     {
+        std::cout << cnt << ": " << readcount << " read.\n";
+
         // Store original samples
         debug_input_file.write(fft_input_buffer.data() + 2*L, std::min(static_cast<int>(readcount), N - 2*L));
+
+        if (readcount < N - 2*L) {
+            std::fill(std::begin(fft_input_buffer) + 2*L + readcount, std::end(fft_input_buffer), 0);
+            std::cout << "filled " << N - (2*L + readcount) << " zeros.\n";
+        }
 
         write_data(fft_input_buffer, "fft_input_buffer_" + std::to_string(cnt) + ".asc");
 
