@@ -15,9 +15,19 @@
 namespace {
     const auto precision = []() -> std::streamsize {
         // https://www.working-software.com/cpp-floats-as-decimal
-        if (std::is_same<kiss_fft_scalar, float>::value) return 9;
-        if (std::is_same<kiss_fft_scalar, double>::value) return 17;
+        if (std::is_same<kiss_fft_scalar, float>::value)
+            return 9;
+        if (std::is_same<kiss_fft_scalar, double>::value)
+            return 17;
         return std::cout.precision();
+    }();
+
+    const auto format = []() {
+            if (std::is_same<kiss_fft_scalar, float>::value)
+                return SF_FORMAT_WAV | SF_FORMAT_FLOAT;
+            if (std::is_same<kiss_fft_scalar, double>::value)
+                return SF_FORMAT_WAV | SF_FORMAT_DOUBLE;
+            return SF_FORMAT_WAV | SF_FORMAT_PCM_16;
     }();
 
     template <typename T>
@@ -71,7 +81,7 @@ int main(int argc, char *argv[])
 
     const std::string output_filename = "upsampling_algorithm_long_sequence_out_real_fft.wav";
     SndfileHandle output_file(output_filename, SFM_WRITE,
-                              input_file.format(), input_file.channels(), input_file.samplerate() * I/D);
+                              format, input_file.channels(), input_file.samplerate() * I/D);
 
     // Buffers
     std::vector<kiss_fft_scalar>               fft_input_buffer(N);
@@ -137,7 +147,7 @@ int main(int argc, char *argv[])
         std::transform(std::begin(output_buffer), std::end(output_buffer),
                        std::begin(output_buffer),
                        [](const kiss_fft_scalar& scalar) {
-                           kiss_fft_scalar max_val = 0.99999990;
+                           kiss_fft_scalar max_val = 1.0;
                            return std::max(-max_val, std::min(scalar, max_val));
                        });
 
