@@ -78,9 +78,9 @@ int main(int argc, char *argv[])
     std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(N/2 + 1);
     std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M/2 + 1);
     std::vector<kiss_fft_scalar>               ifft_output_buffer(M);
-    std::vector<kiss_fft_scalar>               output_buffer(M - 2*I/D*L);
 
-    int cnt=0;
+    size_t cnt=0;
+    size_t generated_samples=0;
     while (sf_count_t readcount = input_file.read(fft_input_buffer.data() + 2*L, N - 2*L))
     {
         std::cout << cnt << ": " << readcount << " read.\n";
@@ -123,8 +123,18 @@ int main(int argc, char *argv[])
 
         write_data(ifft_output_buffer, "ifft_output_buffer_" + std::to_string(cnt) + ".asc");
 
-        // Discard first and last I/D*L points and store the rest of the real vector
-        std::transform(std::begin(ifft_output_buffer) + I/D*L, std::end(ifft_output_buffer) - I/D*L,
+        // Discard first and last I/D*L points (normal case)
+        // Discard padding zeros at the beginning / end (special cases)
+        const auto nb_elements_to_discard_front = (cnt == 0)            ? I/D*2*L                     : I/D*L;
+        const auto nb_elements_to_discard_back  = (readcount < N - 2*L) ? I/D*(N - (2*L + readcount)) : I/D*L;
+        std::cout << "nb_elements_to_discard_front=" << nb_elements_to_discard_front
+                  << " nb_elements_to_discard_back=" << nb_elements_to_discard_back
+                  << "\n";
+        std::vector<kiss_fft_scalar> output_buffer(std::begin(ifft_output_buffer) + nb_elements_to_discard_front,
+                                                     std::end(ifft_output_buffer) - nb_elements_to_discard_back);
+
+        // Clipping [-1;1]
+        std::transform(std::begin(output_buffer), std::end(output_buffer),
                        std::begin(output_buffer),
                        [](const kiss_fft_scalar& scalar) {
                            kiss_fft_scalar max_val = 0.99999990;
@@ -135,6 +145,8 @@ int main(int argc, char *argv[])
 
         // Store upsampled samples
         output_file.write(output_buffer.data(), output_buffer.size());
+        std::cout << "write " << output_buffer.size() << "\n";
+        generated_samples += output_buffer.size();
 
         // Shift vector to the left 2*L times
         std::rotate(fft_input_buffer.begin(), fft_input_buffer.begin() + N - 2*L, fft_input_buffer.end());
@@ -142,6 +154,7 @@ int main(int argc, char *argv[])
         cnt++;
     };
 
+    std::cout << generated_samples << " generated.\n";
     kiss_fft_cleanup();
     return 0;
 }
