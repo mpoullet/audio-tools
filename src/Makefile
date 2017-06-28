@@ -7,7 +7,7 @@ BINDIR := ../bin
 KISSFFT_DIR := ../KissFFT/kiss_fft130
 
 CPPFLAGS := -I ./include -I $(KISSFFT_DIR)/tools -I $(KISSFFT_DIR) -Wall -Wextra -Werror -pedantic
-CFLAGS := -std=c11
+CFLAGS := -std=c11 -O2
 CXXFLAGS := -std=c++14
 LIBS := -lm -lsndfile -lboost_program_options -lboost_system -lboost_filesystem
 
@@ -15,7 +15,8 @@ all: generate_A440 \
 	 generate_sine_wave \
 	 upsampling_algorithm_short_sequence \
 	 upsampling_algorithm_long_sequence \
-	 upsampling_algorithm_long_sequence_real_fft
+	 upsampling_algorithm_long_sequence_real_fft \
+	 upsampling2x
 
 .PHONY: all clean
 
@@ -40,6 +41,10 @@ upsampling_algorithm_long_sequence: upsampling_algorithm_long_sequence.o $(KISSF
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
 upsampling_algorithm_long_sequence_real_fft: upsampling_algorithm_long_sequence_real_fft.o $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
+	@echo "LD $@"
+	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
+
+upsampling2x: upsampling2x.o $(KISSFFT_DIR)/kiss_fft.o $(KISSFFT_DIR)/tools/kiss_fftr.o
 	@echo "LD $@"
 	$(CXX) -o $(BINDIR)/$@ $^ $(CPPFLAGS) $(CXXFLAGS) $(LIBS)
 
