@@ -78,7 +78,6 @@ int main(int argc, char *argv[])
     std::vector<kiss_fft_scalar>               ifft_output_buffer(M);
 
     size_t cnt=0;
-    size_t generated_samples=0;
     while (sf_count_t readcount = input_file.read(fft_input_buffer.data() + 2*L, N - 2*L))
     {
         if (readcount < N - 2*L) {
@@ -124,7 +123,6 @@ int main(int argc, char *argv[])
 
         // Store upsampled samples
         output_file.write(output_buffer.data(), output_buffer.size());
-        generated_samples += output_buffer.size();
 
         // Shift vector to the left 2*L times
         std::rotate(fft_input_buffer.begin(), fft_input_buffer.begin() + N - 2*L, fft_input_buffer.end());
