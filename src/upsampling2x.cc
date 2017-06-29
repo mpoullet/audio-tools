@@ -73,8 +73,7 @@ int main(int argc, char *argv[])
 
     // Buffers
     std::vector<kiss_fft_scalar>               fft_input_buffer(N);
-    std::vector<std::complex<kiss_fft_scalar>> fft_output_buffer(N/2 + 1);
-    std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M/2 + 1);
+    std::vector<std::complex<kiss_fft_scalar>> tmp_buffer(M/2 + 1);
     std::vector<kiss_fft_scalar>               ifft_output_buffer(M);
 
     size_t cnt=0;
@@ -87,17 +86,15 @@ int main(int argc, char *argv[])
         // Forward N points real FFT
         kiss_fftr(fwd_cfg.get(),
                   reinterpret_cast<kiss_fft_scalar*>(fft_input_buffer.data()),
-                  reinterpret_cast<kiss_fft_cpx*>(fft_output_buffer.data()));
+                  reinterpret_cast<kiss_fft_cpx*>(tmp_buffer.data()));
 
         // Create IFFT input buffer
-        const auto C_i = static_cast<kiss_fft_scalar>(1.0 * D/I) * std::complex<kiss_fft_scalar>(fft_output_buffer[N/2]);
-        std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M/2 + 1, C_i);
-        std::copy(std::begin(fft_output_buffer), std::end(fft_output_buffer) - 1,
-                  std::begin(ifft_input_buffer));
+        const auto C_i = static_cast<kiss_fft_scalar>(1.0 * D/I) * std::complex<kiss_fft_scalar>(tmp_buffer[N/2]);
+        std::fill(std::begin(tmp_buffer) + N/2 + 1, std::end(tmp_buffer), C_i);
 
         // Backward M points IFFT
         kiss_fftri(inv_cfg.get(),
-                   reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer.data()),
+                   reinterpret_cast<kiss_fft_cpx*>(tmp_buffer.data()),
                    reinterpret_cast<kiss_fft_scalar*>(ifft_output_buffer.data()));
 
         // Discard first and last I/D*L points (normal case)
