@@ -94,17 +94,11 @@ int main(int argc, char *argv[])
         std::vector<std::complex<kiss_fft_scalar>> ifft_input_buffer(M/2 + 1, C_i);
         std::copy(std::begin(fft_output_buffer), std::end(fft_output_buffer) - 1,
                   std::begin(ifft_input_buffer));
-        std::transform(std::begin(ifft_input_buffer), std::end(ifft_input_buffer),
-                       std::begin(ifft_input_buffer),
-                       std::bind1st(std::multiplies<std::complex<kiss_fft_scalar>>(), 1.0 * I/D));
 
         // Backward M points IFFT
         kiss_fftri(inv_cfg.get(),
                    reinterpret_cast<kiss_fft_cpx*>(ifft_input_buffer.data()),
                    reinterpret_cast<kiss_fft_scalar*>(ifft_output_buffer.data()));
-        std::transform(std::begin(ifft_output_buffer), std::end(ifft_output_buffer),
-                       std::begin(ifft_output_buffer),
-                       std::bind1st(std::multiplies<kiss_fft_scalar>(), 1.0 / M));
 
         // Discard first and last I/D*L points (normal case)
         // Discard padding zeros at the beginning / end (special cases)
@@ -113,12 +107,15 @@ int main(int argc, char *argv[])
         std::vector<kiss_fft_scalar> output_buffer(std::begin(ifft_output_buffer) + nb_elements_to_discard_front,
                                                      std::end(ifft_output_buffer) - nb_elements_to_discard_back);
 
-        // Clipping [-1;1]
+        // 1 - 1.0/M : make the ifft/fft pair unitary
+        // 2 - I/D : scale factor due to resampling
+        // 3 - clipping to [-1;1]
         std::transform(std::begin(output_buffer), std::end(output_buffer),
                        std::begin(output_buffer),
                        [](const kiss_fft_scalar& scalar) {
                            kiss_fft_scalar max_val = 1.0;
-                           return std::max(-max_val, std::min(scalar, max_val));
+                           kiss_fft_scalar val = scalar * 1.0/M * I/D;
+                           return std::max(-max_val, std::min(val, max_val));
                        });
 
         // Store upsampled samples
