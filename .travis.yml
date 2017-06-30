@@ -18,4 +18,9 @@ script:
 - make -C KissFFT/examples clean all V=1 CC=${CC} CXX=${CXX}
 - make -C src clean all V=1 CC=${CC} CXX=${CXX}
 after_success:
+- bin/generate_A440
+- bin/generate_sine_wave --frequency 440 --sample-rate 48000 --audio-format pcm32 --prefix-name sine --duration 0.00909090 --verbose
 - bin/upsampling_algorithm_short_sequence octave/sine_48000_pcm32_short.wav
+- bin/upsampling_algorithm_long_sequence octave/sine_48000_pcm32_long.wav
+- bin/upsampling_algorithm_long_sequence_real_fft octave/sine_48000_pcm32_long.wav
+- bin/upsampling2x octave/sine_48000_pcm32_long.wav
