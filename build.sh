@@ -34,5 +34,9 @@ if [ "$param1" == "--run" ]; then
     echo -e "${YELLOW}Running upsampling_algorithm_short_sequence${NOCOLOR}"
     bin/upsampling_algorithm_short_sequence octave/sine_48000_pcm32_short.wav
     echo -e "${YELLOW}Running upsampling_algorithm_long_sequence${NOCOLOR}"
-    bin/upsampling_algorithm_long_sequence  octave/sine_48000_pcm32_long.wav
+    bin/upsampling_algorithm_long_sequence octave/sine_48000_pcm32_long.wav
+    echo -e "${YELLOW}Running upsampling_algorithm_long_sequence_real_fft${NOCOLOR}"
+    bin/upsampling_algorithm_long_sequence_real_fft octave/sine_48000_pcm32_long.wav
+    echo -e "${YELLOW}Running upsampling2x${NOCOLOR}"
+    bin/upsampling2x octave/sine_48000_pcm32_long.wav
 fi
