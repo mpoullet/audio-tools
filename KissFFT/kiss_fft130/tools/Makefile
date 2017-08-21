@@ -24,7 +24,7 @@ endif
 
 ifneq ("$(KISS_FFT_USE_ALLOCA)","")
 	CFLAGS+= -DKISS_FFT_USE_ALLOCA=1
-endif 
+endif
 CFLAGS+= $(CFLAGADD)
 
 
@@ -34,17 +34,17 @@ FASTFILTREAL=fastconvr_$(DATATYPE)
 PSDPNG=psdpng_$(DATATYPE)
 DUMPHDR=dumphdr_$(DATATYPE)
 
-all: $(FFTUTIL) $(FASTFILT) $(FASTFILTREAL) 
-# 	$(PSDPNG) 
+all: $(FFTUTIL) $(FASTFILT) $(FASTFILTREAL)
+# 	$(PSDPNG)
 #	$(DUMPHDR)
 
 #CFLAGS=-Wall -O3 -pedantic -march=pentiumpro -ffast-math -fomit-frame-pointer $(WARNINGS)
 # If the above flags do not work, try the following
-CFLAGS=-Wall -O3 $(WARNINGS) 
+CFLAGS=-Wall -O3 $(WARNINGS)
 # tip: try -openmp or -fopenmp to use multiple cores
 
 $(FASTFILTREAL): ../kiss_fft.c kiss_fastfir.c kiss_fftr.c
-	$(CC) -o $@ $(CFLAGS) -I.. $(TYPEFLAGS) -DREAL_FASTFIR  $+ -DFAST_FILT_UTIL -lm 
+	$(CC) -o $@ $(CFLAGS) -I.. $(TYPEFLAGS) -DREAL_FASTFIR  $+ -DFAST_FILT_UTIL -lm
 
 $(FASTFILT): ../kiss_fft.c kiss_fastfir.c
 	$(CC) -o $@ $(CFLAGS) -I.. $(TYPEFLAGS) $+  -DFAST_FILT_UTIL -lm
