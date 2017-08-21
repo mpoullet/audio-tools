@@ -11,7 +11,7 @@ function [x, y] = plot_wav_file(filename, title_name)
     ylabel('Amplitude');
     ylim([-1 1]);
     title(title_name);
-    
+
     x = t_all;
     y = data;
 end
