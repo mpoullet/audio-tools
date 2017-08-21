@@ -4,10 +4,10 @@ WARNINGS=-W -Wall -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return \
     -Wwrite-strings
 
 CFLAGS=-O3 -I.. -I../tools $(WARNINGS)
-CFLAGS+=-ffast-math -fomit-frame-pointer 
+CFLAGS+=-ffast-math -fomit-frame-pointer
 #CFLAGS+=-funroll-loops
-#CFLAGS+=-march=prescott 
-#CFLAGS+= -mtune=native 
+#CFLAGS+=-march=prescott
+#CFLAGS+= -mtune=native
 # TIP: try adding -openmp or -fopenmp  to enable OPENMP directives and use of multiple cores
 #CFLAGS+=-fopenmp
 CFLAGS+= $(CFLAGADD)
@@ -35,12 +35,12 @@ SELFTESTSRC=twotonetest.c
 
 TYPEFLAGS=-Dkiss_fft_scalar=$(DATATYPE)
 
-ifeq  "$(DATATYPE)" "int16_t" 
+ifeq  "$(DATATYPE)" "int16_t"
  TYPEFLAGS=-DFIXED_POINT=16
 endif
 
 ifeq  "$(DATATYPE)" "int32_t"
- TYPEFLAGS=-DFIXED_POINT=32 
+ TYPEFLAGS=-DFIXED_POINT=32
 endif
 
 ifeq  "$(DATATYPE)" "simd"
@@ -66,9 +66,9 @@ tools:
 
 
 $(SELFTEST): $(SELFTESTSRC) $(SRCFILES)
-	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $+ -lm 
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $+ -lm
 
-$(TESTKFC): $(SRCFILES) 
+$(TESTKFC): $(SRCFILES)
 	$(CC) -o $@ $(CFLAGS)  -DKFC_TEST $(TYPEFLAGS) $+ -lm
 	
 $(TESTREAL): test_real.c $(SRCFILES)
@@ -88,7 +88,7 @@ test: all
 	@echo "======real FFT (type= $(DATATYPE) )"
 	@./$(TESTREAL)
 	@echo "======timing test (type=$(DATATYPE))"
-	@./$(BENCHKISS) -x $(NUMFFTS) -n $(NFFT) 
+	@./$(BENCHKISS) -x $(NUMFFTS) -n $(NFFT)
 	@[ -x ./$(BENCHFFTW) ] && ./$(BENCHFFTW) -x $(NUMFFTS) -n $(NFFT) ||true
 	@echo "======higher dimensions type=$(DATATYPE))"
 	@./testkiss.py
