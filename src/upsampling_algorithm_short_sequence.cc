@@ -68,23 +68,23 @@ int main(int argc, char *argv[])
     }
 
     // Kiss FFT complex configurations
-    const auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto fwd_cfg = std::unique_ptr<std::remove_pointer_t<kiss_fft_cfg>, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, nullptr, nullptr),
         kiss_fft_free
     };
 
-    const auto inv_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto inv_cfg = std::unique_ptr<std::remove_pointer_t<kiss_fft_cfg>, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(M, 1, nullptr, nullptr),
         kiss_fft_free
     };
 
     // Kiss FFT real configurarions
-    const auto fwd_cfg_r = std::unique_ptr<std::remove_pointer<kiss_fftr_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto fwd_cfg_r = std::unique_ptr<std::remove_pointer_t<kiss_fftr_cfg>, decltype(kiss_fft_free) *> {
         kiss_fftr_alloc(N, 0, nullptr, nullptr),
         kiss_fft_free
     };
 
-    const auto inv_cfg_r = std::unique_ptr<std::remove_pointer<kiss_fftr_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto inv_cfg_r = std::unique_ptr<std::remove_pointer_t<kiss_fftr_cfg>, decltype(kiss_fft_free) *> {
         kiss_fftr_alloc(M, 1, nullptr, nullptr),
         kiss_fft_free
     };

@@ -61,12 +61,12 @@ int main(int argc, char *argv[])
     }
 
     // Kiss FFT configurations
-    const auto fwd_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto fwd_cfg = std::unique_ptr<std::remove_pointer_t<kiss_fft_cfg>, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, nullptr, nullptr),
         kiss_fft_free
     };
 
-    const auto inv_cfg = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    const auto inv_cfg = std::unique_ptr<std::remove_pointer_t<kiss_fft_cfg>, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(M, 1, nullptr, nullptr),
         kiss_fft_free
     };
