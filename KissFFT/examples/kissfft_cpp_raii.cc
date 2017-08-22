@@ -22,10 +22,10 @@
 
 namespace std {
     template<>
-    class default_delete<std::remove_pointer<kiss_fft_cfg>::type>
+    class default_delete<std::remove_pointer_t<kiss_fft_cfg>>
     {
         public:
-            void operator()(std::remove_pointer<kiss_fft_cfg>::type *p) { kiss_fft_free(p); }
+            void operator()(std::remove_pointer_t<kiss_fft_cfg> *p) { kiss_fft_free(p); }
     };
 }
 
@@ -41,13 +41,13 @@ int main()
     }
 
     // RAII without default_delete
-    auto cfg1 = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type, decltype(kiss_fft_free) *> {
+    auto cfg1 = std::unique_ptr<std::remove_pointer_t<kiss_fft_cfg>, decltype(kiss_fft_free) *> {
         kiss_fft_alloc(N, 0, NULL, NULL),
         kiss_fft_free
     };
 
     // RAII with default delete
-    auto cfg2 = std::unique_ptr<std::remove_pointer<kiss_fft_cfg>::type> {
+    auto cfg2 = std::unique_ptr<std::remove_pointer_t<kiss_fft_cfg>> {
         kiss_fft_alloc(N, 0, NULL, NULL)
     };
 
