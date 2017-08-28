@@ -33,18 +33,18 @@ namespace {
 
 int main(int argc, char *argv[])
 {
-    const int I = 2;
-    const int D = 1;
-    const int N = 256;
-    const int M = I/D*N;
-    const int L = N/8;
+    const auto I { 2 };
+    const auto D { 1 };
+    const auto N { 256 };
+    const auto M { I/D*N };
+    const auto L { N/8 };
 
     if (argc != 2) {
         std::cerr << "Usage: upsampling_algorithm_long_sequence <filename>\n";
         return -1;
     }
 
-    const std::string input_filename = argv[argc-1];
+    const std::string input_filename { argv[argc-1] };
     SndfileHandle input_file(input_filename);
     if (input_file.channels() != 1) {
         std::cerr << "Only files with one audio channel are supported.\n";
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    const std::string output_filename = input_filename.substr(0, input_filename.rfind(".")) + "_upsampled2x.wav";
+    const auto output_filename = input_filename.substr(0, input_filename.rfind(".")) + "_upsampled2x.wav";
     SndfileHandle output_file(output_filename, SFM_WRITE,
                               format, input_file.channels(), input_file.samplerate() * I/D);
 

@@ -43,17 +43,17 @@ namespace {
 
 int main(int argc, char *argv[])
 {
-    const int I = 2;
-    const int D = 1;
-    const int N = 256;
-    const int M = I/D*N;
+    const auto I { 2 };
+    const auto D { 1 };
+    const auto N { 256 };
+    const auto M { I/D*N };
 
     if (argc != 2) {
         std::cerr << "Usage upsampling_algorithm_short_sequence <filename>\n";
         return -1;
     }
 
-    const std::string input_filename = argv[argc-1];
+    const std::string input_filename { argv[argc-1] };
     SndfileHandle input_file(input_filename);
     if (input_file.channels() != 1) {
         std::cerr << "Only files with one audio channel are supported.\n";

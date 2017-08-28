@@ -13,9 +13,9 @@
 #include "NamedType.hpp"
 
 namespace {
-const size_t ERROR_IN_COMMAND_LINE = 1;
-const size_t SUCCESS = 0;
-const size_t ERROR_UNHANDLED_EXCEPTION = 2;
+    const size_t ERROR_IN_COMMAND_LINE = 1;
+    const size_t SUCCESS = 0;
+    const size_t ERROR_UNHANDLED_EXCEPTION = 2;
 }
 
 namespace parameters {
@@ -178,12 +178,12 @@ int main(int argc, char **argv) {
         po::variables_map vm;
 
         // Default values
-        double frequency = 440.0;
-        double duration = 1.0;
-        int sample_rate = 48000;
+        auto frequency { 440.0 };
+        auto duration { 1 };
+        auto sample_rate { 48000 };
         std::string audio_format = "pcm24";
         std::string prefix = "sine";
-        bool verbose = false;
+        auto verbose { false };
 
         try {
             po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -224,8 +224,8 @@ int main(int argc, char **argv) {
             std::cerr << desc << std::endl;
             return ERROR_IN_COMMAND_LINE;
         }
-        double sample_duration = 1.0/sample_rate;
-        int sample_count = sample_rate * duration;
+        auto sample_duration { 1.0/sample_rate };
+        auto sample_count { sample_rate * duration };
 
         std::stringstream ss;
         ss << prefix;
@@ -238,7 +238,7 @@ int main(int argc, char **argv) {
 
         if (verbose) {
             printf("\nfrequency=%f\n", frequency);
-            printf("duration=%f\n", duration);
+            printf("duration=%d\n", duration);
             printf("sample_rate=%d\n", sample_rate);
             printf("sample_count=%d\n", sample_count);
             printf("sample_duration=%f\n", sample_duration);
@@ -251,7 +251,7 @@ int main(int argc, char **argv) {
         std::vector<double> buffer(sample_count);
 
         for (int k = 0; k < sample_count; k++) {
-            const double pi = 3.14159265358979323846264338;
+            const auto pi { 3.14159265358979323846264338 };
             buffer[k] = sin(frequency * 2 * k * pi / sample_rate);
             if (verbose) printf("%8d: %.8f: % .8f\n", k, sample_duration*k, buffer[k]);
         }
