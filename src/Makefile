@@ -1,9 +1,9 @@
 # Makefile to build Kiss FFT examples
 
 # https://stackoverflow.com/a/16346321
-create_bin_dir := $(shell mkdir -p ../bin)
-
 BINDIR := ../bin
+create_bin_dir := $(shell mkdir -p $(BINDIR))
+
 KISSFFT_DIR := ../KissFFT/kiss_fft130
 
 CPPFLAGS := -I ./include -I $(KISSFFT_DIR)/tools -I $(KISSFFT_DIR) -Wall -Wextra -Werror -pedantic
