@@ -5,16 +5,16 @@
 #include <sndfile.hh>
 
 int main() {
-    constexpr auto pi { 3.14159265358979323846264338 };
-    constexpr auto freq { 440.0 };
-    constexpr auto duration { 1 };
-    constexpr auto samplerate { 48000 };
-    constexpr auto sample_duration { 1.0/samplerate };
-    constexpr auto sample_count { samplerate * duration };
+    const auto pi { 3.14159265358979323846264338 };
+    const auto freq { 440.0 };
+    const auto duration { 1.0 };
+    const auto samplerate { 48000 };
+    const auto sample_duration { 1.0/samplerate };
+    const int  sample_count = samplerate * std::round(duration);
 
     static_assert(std::is_same<const double, decltype(pi)>::value, "");
     static_assert(std::is_same<const double, decltype(freq)>::value, "");
-    static_assert(std::is_same<const int, decltype(duration)>::value, "");
+    static_assert(std::is_same<const double, decltype(duration)>::value, "");
     static_assert(std::is_same<const int, decltype(samplerate)>::value, "");
     static_assert(std::is_same<const double, decltype(sample_duration)>::value, "");
     static_assert(std::is_same<const int, decltype(sample_count)>::value, "");
