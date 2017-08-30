@@ -6,6 +6,7 @@
 #include <boost/any.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/filesystem.hpp>
 
 #include <sndfile.hh>
@@ -179,7 +180,7 @@ int main(int argc, char **argv) {
 
         // Default values
         auto frequency { 440.0 };
-        auto duration { 1 };
+        auto duration { 1.0 };
         auto sample_rate { 48000 };
         std::string audio_format = "pcm24";
         std::string prefix = "sine";
@@ -224,8 +225,9 @@ int main(int argc, char **argv) {
             std::cerr << desc << std::endl;
             return ERROR_IN_COMMAND_LINE;
         }
-        auto sample_duration { 1.0/sample_rate };
-        auto sample_count { sample_rate * duration };
+        const auto sample_duration { 1.0/sample_rate };
+        const auto sample_count = sample_rate * boost::numeric_cast<int>(std::round(duration));
+        static_assert(std::is_same<const int, decltype(sample_count)>::value, "");
 
         std::stringstream ss;
         ss << prefix;
@@ -238,7 +240,7 @@ int main(int argc, char **argv) {
 
         if (verbose) {
             printf("\nfrequency=%f\n", frequency);
-            printf("duration=%d\n", duration);
+            printf("duration=%f\n", duration);
             printf("sample_rate=%d\n", sample_rate);
             printf("sample_count=%d\n", sample_count);
             printf("sample_duration=%f\n", sample_duration);
