@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include <array>
+#include <vector>
 
 #include <sndfile.hh>
 
@@ -26,7 +26,7 @@ int main() {
     std::cout << "freq="            << freq;
     std::cout << std::endl;
 
-    std::array<double, sample_count> buffer;
+    std::vector<double> buffer(sample_count);
     for (int k = 0; k < sample_count; ++k) {
         buffer[k] = sin(freq * 2 * k * pi / samplerate);
         //std::cout << k << ": " << sample_duration*k << ": " << buffer[k] << "\n";
