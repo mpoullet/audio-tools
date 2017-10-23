@@ -8,7 +8,7 @@ KISSFFT_DIR := ../KissFFT/kiss_fft130
 
 CPPFLAGS := -I ./include -I $(KISSFFT_DIR)/tools -I $(KISSFFT_DIR) -Wall -Wextra -Werror -pedantic
 CFLAGS := -std=c11 -O2
-CXXFLAGS := -std=c++14
+CXXFLAGS := -std=c++17
 LIBS := -lm -lsndfile -lboost_program_options -lboost_system -lboost_filesystem
 
 all: generate_A440 \
