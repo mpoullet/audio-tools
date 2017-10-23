@@ -14,7 +14,7 @@ compiler:
 before_install:
 - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 - wget -nv -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-- sudo apt-add-repository -y 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
+- sudo apt-add-repository -y 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
 - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 - sudo apt-get -qq update
 
@@ -34,10 +34,17 @@ install:
 - sudo apt-get install -y libsndfile1-dev
 - sudo apt-get install -qq -y g++-7
 - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
-- sudo apt-get install -qq -y clang-4.0
-- export PATH=$(echo $PATH | sed -e 's/\/usr\/local\/clang-3.5.0\/bin://')
-- sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-4.0 100
-- sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-4.0 100
+- sudo apt-get install -qq -y clang-5.0
+- echo $PATH
+- which clang++
+- clang++ --version
+- which clang++-5.0
+- clang++-5.0 --version
+- export PATH=$(echo $PATH | sed -e 's/\/usr\/local\/clang-3.9.0\/bin://')
+- sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-5.0 100
+- sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-5.0 100
+- which clang++
+- clang++ --version
 script:
 - echo "Using ${CXX} version $(${CXX} -dumpversion)"
 - make -C KissFFT/examples clean all V=1 CC=${CC} CXX=${CXX}
