@@ -11,10 +11,10 @@ NOCOLOR='\033[0m'
 
 echo -e "${YELLOW}Building with gcc/g++...${NOCOLOR}"
 make -C KissFFT/examples clean all CC=gcc   CXX=g++
-make -C KissFFT/examples clean all CC=clang CXX=clang++
+make -C src clean all CC=gcc   CXX=g++
 
 echo -e "${YELLOW}Building with clang/clang++...${NOCOLOR}"
-make -C src clean all CC=gcc   CXX=g++
+make -C KissFFT/examples clean all CC=clang CXX=clang++
 make -C src clean all CC=clang CXX=clang++
 
 echo -e "${YELLOW}Checking C/C++ source code...${NOCOLOR}"
