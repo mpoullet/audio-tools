@@ -12,12 +12,12 @@ int main() {
     const auto sample_duration { 1.0/samplerate };
     const int  sample_count = samplerate * std::round(duration);
 
-    static_assert(std::is_same<const double, decltype(pi)>::value, "");
-    static_assert(std::is_same<const double, decltype(freq)>::value, "");
-    static_assert(std::is_same<const double, decltype(duration)>::value, "");
-    static_assert(std::is_same<const int, decltype(samplerate)>::value, "");
-    static_assert(std::is_same<const double, decltype(sample_duration)>::value, "");
-    static_assert(std::is_same<const int, decltype(sample_count)>::value, "");
+    static_assert(std::is_same_v<const double, decltype(pi)>);
+    static_assert(std::is_same_v<const double, decltype(freq)>);
+    static_assert(std::is_same_v<const double, decltype(duration)>);
+    static_assert(std::is_same_v<const int, decltype(samplerate)>);
+    static_assert(std::is_same_v<const double, decltype(sample_duration)>);
+    static_assert(std::is_same_v<const int, decltype(sample_count)>);
 
     std::cout << "duration="        << duration << "\n";
     std::cout << "samplerate="      << samplerate << "\n";

@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
         }
         const auto sample_duration { 1.0/sample_rate };
         const auto sample_count = sample_rate * boost::numeric_cast<int>(std::round(duration));
-        static_assert(std::is_same<const int, decltype(sample_count)>::value, "");
+        static_assert(std::is_same_v<const int, decltype(sample_count)>);
 
         std::stringstream ss;
         ss << prefix;
