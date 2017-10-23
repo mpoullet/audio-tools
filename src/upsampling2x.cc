@@ -23,9 +23,9 @@ namespace {
     }();
 
     const auto format = []() {
-            if (std::is_same<kiss_fft_scalar, float>::value)
+            if (std::is_same_v<kiss_fft_scalar, float>)
                 return SF_FORMAT_WAV | SF_FORMAT_FLOAT;
-            if (std::is_same<kiss_fft_scalar, double>::value)
+            if (std::is_same_v<kiss_fft_scalar, double>)
                 return SF_FORMAT_WAV | SF_FORMAT_DOUBLE;
             return SF_FORMAT_WAV | SF_FORMAT_PCM_16;
     }();
