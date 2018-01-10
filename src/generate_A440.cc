@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 #include <sndfile.hh>
@@ -28,11 +30,9 @@ int main ()
     std::cout << std::endl;
 
     std::vector<double> buffer (sample_count);
-    for (int k = 0; k < sample_count; ++k)
-    {
-        buffer[k] = sin (freq * 2 * k * pi / samplerate);
-        //std::cout << k << ": " << sample_duration*k << ": " << buffer[k] << "\n";
-    }
+    std::iota (std::begin (buffer), std::end (buffer), 0);
+    std::transform (std::begin (buffer), std::end (buffer), std::begin (buffer),
+                    [&](auto k) { return sin (freq * 2 * k * pi / samplerate); });
 
     SndfileHandle sndfilehandle_pcm32 ("sine_" + std::to_string (freq) + "_" + std::to_string (samplerate) + "_pcm32.wav",
                                        SFM_WRITE,
