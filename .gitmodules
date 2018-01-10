@@ -1,0 +1,3 @@
+[submodule "ni-media"]
+	path = ni-media
+	url = https://github.com/NativeInstruments/ni-media.git
