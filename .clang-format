@@ -2,7 +2,7 @@ BasedOnStyle: LLVM
 Language : Cpp
 Standard : Cpp11
 
-# JUCE coding conventions http://www.juce.com/documentation/coding-standards
+# JUCE coding conventions https://juce.com/learn/coding-standards
 IndentWidth: 4
 ContinuationIndentWidth: 4
 UseTab: Never
